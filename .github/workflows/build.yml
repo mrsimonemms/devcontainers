@@ -8,6 +8,10 @@ permissions:
 jobs:
   base:
     runs-on: ubuntu-latest
+    outputs:
+      docker_registry: ${{ steps.tags.outputs.docker_registry }}
+      matrix: ${{ steps.tags.outputs.matrix }}
+      tag: ${{ steps.tags.outputs.tag }}
     steps:
       - uses: actions/checkout@v3
         with:
@@ -30,6 +34,7 @@ jobs:
         id: tags
         run: |
           echo "docker_registry=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+          echo "matrix={\"img\": $(jq -ncR '[inputs]' <<< $(ls -d images/*))}" >> "$GITHUB_OUTPUT"
           echo "tag=$(date --iso-8601)" >> "$GITHUB_OUTPUT"
 
       - name: Build and push
@@ -40,3 +45,59 @@ jobs:
           pull: true
           push: ${{ github.ref == 'refs/heads/main' }} # Only push on main branch
           tags: ${{ steps.tags.outputs.docker_registry }}/base:${{ steps.tags.outputs.tag }},${{ steps.tags.outputs.docker_registry }}/base:latest # Create latest + date tags
+
+  images:
+    runs-on: ubuntu-latest
+    needs:
+      - base
+    strategy:
+      matrix: ${{ fromJSON(needs.base.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate Docker tag
+        id: tags
+        run: |
+          echo "name=$(echo ${{ matrix.img }} | sed 's/images\///' )" >> "$GITHUB_OUTPUT"
+
+      - name: Install Dev Container CLI
+        run: |
+          npm install -g @devcontainers/cli
+          devcontainer --version
+
+      - name: Build Dev Container
+        run: |
+          docker pull ${{ needs.base.outputs.docker_registry }}/${{ steps.tags.outputs.name }}:latest || true
+
+          devcontainer build \
+            --platform=linux/amd64 \
+            --image-name=${{ needs.base.outputs.docker_registry }}/${{ steps.tags.outputs.name }}:${{ needs.base.outputs.tag }} \
+            --image-name=${{ needs.base.outputs.docker_registry }}/${{ steps.tags.outputs.name }}:latest \
+            --workspace-folder=${{ matrix.img }}
+
+          if [ ${{ github.ref == 'refs/heads/main' }} = "true" ]; then
+            echo "Pushing images"
+
+            docker push ${{ needs.base.outputs.docker_registry }}/${{ steps.tags.outputs.name }}:${{ needs.base.outputs.tag }}
+            docker push ${{ needs.base.outputs.docker_registry }}/${{ steps.tags.outputs.name }}:latest
+          fi
