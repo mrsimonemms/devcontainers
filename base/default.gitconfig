@@ -1,0 +1,4 @@
+[safe]
+	directory = *
+[core]
+	editor = code --wait
