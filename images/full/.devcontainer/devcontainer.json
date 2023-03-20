@@ -3,6 +3,7 @@
   "image": "ghcr.io/mrsimonemms/devcontainers/base",
   "features": {
     "ghcr.io/devcontainers-contrib/features/cookiecutter:2": {},
+    "ghcr.io/ChristopherMacGown/devcontainer-features/direnv:1": {},
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
     "ghcr.io/devcontainers/features/go:1": {},
     "ghcr.io/meaningful-ooo/devcontainer-features/homebrew:2": {},
