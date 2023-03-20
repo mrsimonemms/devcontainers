@@ -8,6 +8,11 @@
     "ghcr.io/meaningful-ooo/devcontainer-features/homebrew:2": {},
     "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {},
     "ghcr.io/devcontainers/features/java:1": {},
+    "ghcr.io/eitsupi/devcontainer-features/jq-likes:1": {
+      "jqVersion": "none",
+      "yqVersion": "4",
+      "gojqVersion": "none"
+    },
     "ghcr.io/devcontainers/features/nix:1": {},
     "ghcr.io/devcontainers/features/node:1": {},
     "ghcr.io/devcontainers/features/php:1": {},
