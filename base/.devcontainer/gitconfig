@@ -1,0 +1,16 @@
+[alias]
+	cp = cherry-pick
+	co = checkout
+	ci = commit
+	st = status
+	lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+[core]
+	pager = diff-so-fancy | less --tabs=4 -RFX
+[init]
+	defaultBranch = main
+[interactive]
+	diffFilter = diff-so-fancy --patch
+[push]
+	autoSetupRemote = true
+[pull]
+	rebase = true

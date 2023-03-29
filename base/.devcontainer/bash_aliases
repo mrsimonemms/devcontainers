@@ -1,0 +1,9 @@
+#!/bin/bash
+# Collection of aliases
+#
+# This is run every time a new terminal window opens, so
+# ensure these commands are fast!
+
+alias k=kubectl
+alias kns=kubens
+alias ktx=kubectx

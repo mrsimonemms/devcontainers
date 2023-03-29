@@ -5,11 +5,6 @@ FROM --platform=${TARGETPLATFORM:-linux/amd64} mcr.microsoft.com/vscode/devconta
 
 USER root
 
-LABEL devcontainer.metadata='[{ \
-  "remoteUser": "vscode", \
-  "shutdownAction": "stopContainer" \
-}]'
-
 # Base
 RUN apt-get update \
   && apt-get -y install \
@@ -45,27 +40,33 @@ RUN apt-get update \
 ENV LANG=en_GB.UTF-8
 
 # Update packages
-RUN apt-get -y upgrade \
-  && apt-get -y autoremove \
+RUN apt-get -y autoremove \
   && apt-get -y autoclean \
   && apt-get -y clean
+RUN rm -rf \
+  /var/cache/debconf/* \
+  /var/lib/apt/lists/* \
+  /tmp/* \
+  /var/tmp/*
 
 # Configure git-lfs
 RUN git lfs install --system --skip-repo
 
 # Install diff-so-fancy
-# @link https://github.com/aos/dsf-debian
+# @link https://github.com/so-fancy/diff-so-fancy
 RUN add-apt-repository ppa:aos1/diff-so-fancy \
   && apt-get update \
   && apt-get install -y diff-so-fancy
 
 USER vscode
+WORKDIR /home/vscode
 
 RUN { echo && echo "PS1='\[\033[01;32m\]\u\[\033[00m\] \[\033[01;34m\]\w\[\033[00m\]\$(__git_ps1 \" (%s)\") $ '" ; } >> $HOME/.bashrc
 
-COPY default.gitconfig /etc/gitconfig
+COPY --chown=vscode:vscode bash_aliases .bash_aliases
+COPY --chown=vscode:vscode gitconfig .config/git/config
 
 # Custom PATH additions
-ENV PATH=$HOME/.local/bin:/usr/games:$PATH
+ENV PATH=$HOME/.local/bin:$PATH
 
 WORKDIR /code
