@@ -58,14 +58,27 @@ jobs:
           echo "matrix={\"img\": $(jq -ncR '[inputs]' <<< $(ls -d images/*))}" >> "$GITHUB_OUTPUT"
           echo "tag=$(date --iso-8601)" >> "$GITHUB_OUTPUT"
 
-      - name: Build and push
-        uses: docker/build-push-action@v4
-        with:
-          context: base
-          platforms: linux/amd64
-          pull: true
-          push: ${{ github.ref == 'refs/heads/main' }} # Only push on main branch
-          tags: ${{ steps.tags.outputs.docker_registry }}/base:${{ steps.tags.outputs.tag }},${{ steps.tags.outputs.docker_registry }}/base:latest # Create latest + date tags
+      - name: Install Dev Container CLI
+        run: |
+          npm install -g @devcontainers/cli
+          devcontainer --version
+
+      - name: Build Dev Container
+        run: |
+          docker pull ${{ steps.tags.outputs.docker_registry }}/base:latest || true
+
+          devcontainer build \
+            --platform=linux/amd64 \
+            --image-name=${{ steps.tags.outputs.docker_registry }}/base:${{ steps.tags.outputs.tag }} \
+            --image-name=${{ steps.tags.outputs.docker_registry }}/base:latest \
+            --workspace-folder=base
+
+          if [ ${{ github.ref == 'refs/heads/main' }} = "true" ]; then
+            echo "Pushing images"
+
+            docker push ${{ steps.tags.outputs.docker_registry }}/base:${{ steps.tags.outputs.tag }}
+            docker push ${{ steps.tags.outputs.docker_registry }}/base:latest
+          fi
 
   images:
     runs-on: ubuntu-latest
