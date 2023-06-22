@@ -13,6 +13,20 @@ permissions:
   contents: write
   packages: write
 jobs:
+  features:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Publish
+        uses: devcontainers/action@v1
+        with:
+          publish-features: "true"
+          base-path-to-features: "./features"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   base:
     runs-on: ubuntu-latest
     outputs:
