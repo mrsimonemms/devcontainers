@@ -1,0 +1,22 @@
+{
+  "name": "Cobra CLI",
+  "id": "cobra-cli",
+  "version": "0.1.0",
+  "description": "Install the Cobra CLI",
+  "documentationURL": "https://github.com/mrsimonemms/devcontainers/tree/main/features/cobra-cli",
+  "options": {
+    "version": {
+      "type": "string",
+      "proposals": [
+          "latest",
+          "v1.3.0"
+      ],
+      "default": "latest",
+      "description": "Select the version you would like to install"
+    }
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/go"
+  ]
+}
