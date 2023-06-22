@@ -14,6 +14,7 @@
       "yqVersion": "4",
       "gojqVersion": "none"
     },
+    "ghcr.io/devcontainers-contrib/features/kubectx-kubens:1": {},
     "ghcr.io/devcontainers/features/nix:1": {},
     "ghcr.io/devcontainers/features/node:1": {},
     "ghcr.io/devcontainers/features/php:1": {},
