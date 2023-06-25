@@ -1,0 +1,66 @@
+name: "Update Documentation"
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    environment: documentation
+    if: ${{ github.ref == 'refs/heads/main' }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Generate Documentation
+        uses: devcontainers/action@v1
+        with:
+          generate-docs: "true"
+          base-path-to-features: "./features"
+
+      - name: Create a PR for Documentation
+        id: push_image_info
+        env:
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        run: |
+          set -e
+          echo "Start."
+
+          # Configure git and Push updates
+          git config --global user.email github-actions@github.com
+          git config --global user.name github-actions
+          git config pull.rebase false
+
+          echo 2
+
+          which gh
+
+          branch=automated-documentation-update-$GITHUB_RUN_ID
+          git checkout -b $branch
+          message='docs(features): automated documentation update'
+
+          echo 3
+
+          # Add / update and commit
+          git add */**/README.md
+
+          echo 4
+          git commit -m "${message}" || export NO_UPDATES=true
+          echo 5
+
+          # Push
+          if [ "$NO_UPDATES" != "true" ] ; then
+              echo 6
+              git push origin "$branch"
+              echo 7
+              gh api \
+                --method POST \
+                -H "Accept: application/vnd.github+json" \
+                /repos/${GITHUB_REPOSITORY}/pulls \
+                -f title="$message" \
+              -f body="$message" \
+              -f head="$branch" \
+              -f base='main'
+          fi
