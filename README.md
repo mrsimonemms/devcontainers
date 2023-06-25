@@ -5,6 +5,7 @@ Prebuilt Dev Container images
 <!-- toc -->
 
 * [Purpose](#purpose)
+* [Features](#features)
 * [Images](#images)
   * [Base](#base)
   * [Full](#full)
@@ -20,6 +21,10 @@ This replicates the [Gitpod workspace images](https://www.gitpod.io/docs/configu
 in [Dev Containers](https://code.visualstudio.com/docs/devcontainers/containers).
 The replaces a commercial product with a free piece of software and takes advantage
 of truly local development.
+
+## Features
+
+* [Cobra CLI](./features/cobra-cli)
 
 ## Images
 
