@@ -32,7 +32,6 @@ jobs:
     outputs:
       docker_registry: ${{ steps.tags.outputs.docker_registry }}
       matrix: ${{ steps.tags.outputs.matrix }}
-      platforms: ${{ steps.tags.outputs.platforms }}
       tag: ${{ steps.tags.outputs.tag }}
     steps:
       - uses: actions/checkout@v3
@@ -59,13 +58,6 @@ jobs:
           echo "matrix={\"img\": $(jq -ncR '[inputs]' <<< $(ls -d images/*))}" >> "$GITHUB_OUTPUT"
           echo "tag=$(date --iso-8601)" >> "$GITHUB_OUTPUT"
 
-          PLATFORMS="linux/amd64"
-          if [ ${{ github.ref == 'refs/heads/main' }} = "true" ]; then
-            PLATFORMS="${PLATFORMS},linux/arm64"
-          fi
-
-          echo "platforms=${PLATFORMS}" >> "$GITHUB_OUTPUT"
-
       - name: Install Dev Container CLI
         run: |
           npm install -g @devcontainers/cli
@@ -75,20 +67,17 @@ jobs:
         run: |
           docker pull ${{ steps.tags.outputs.docker_registry }}/base:latest || true
 
+          devcontainer build \
+            --platform=linux/amd64 \
+            --image-name=${{ steps.tags.outputs.docker_registry }}/base:${{ steps.tags.outputs.tag }} \
+            --image-name=${{ steps.tags.outputs.docker_registry }}/base:latest \
+            --workspace-folder=base
+
           if [ ${{ github.ref == 'refs/heads/main' }} = "true" ]; then
-            devcontainer build \
-              --platform=${{ steps.tags.outputs.platforms }} \
-              --image-name=${{ steps.tags.outputs.docker_registry }}/base:${{ steps.tags.outputs.tag }} \
-              --image-name=${{ steps.tags.outputs.docker_registry }}/base:latest \
-              --workspace-folder=base \
-              --push
-          else
-            devcontainer build \
-              --platform=${{ steps.tags.outputs.platforms }} \
-              --image-name=${{ steps.tags.outputs.docker_registry }}/base:${{ steps.tags.outputs.tag }} \
-              --image-name=${{ steps.tags.outputs.docker_registry }}/base:latest \
-              --workspace-folder=base \
-              --output=cacheonly
+            echo "Pushing images"
+
+            docker push ${{ steps.tags.outputs.docker_registry }}/base:${{ steps.tags.outputs.tag }}
+            docker push ${{ steps.tags.outputs.docker_registry }}/base:latest
           fi
 
   images:
@@ -134,18 +123,15 @@ jobs:
         run: |
           docker pull ${{ needs.base.outputs.docker_registry }}/${{ steps.tags.outputs.name }}:latest || true
 
-          if [ ${{ github.ref == 'refs/heads/main' }} = "true" ]; then
-            devcontainer build \
-              --platform=${{ needs.base.outputs.platforms }} \
-              --image-name=${{ needs.base.outputs.docker_registry }}/${{ steps.tags.outputs.name }}:${{ needs.base.outputs.tag }} \
-              --image-name=${{ needs.base.outputs.docker_registry }}/${{ steps.tags.outputs.name }}:latest \
-              --workspace-folder=${{ matrix.img }} \
-              --push
-          else
-            devcontainer build \
-            --platform=${{ needs.base.outputs.platforms }} \
+          devcontainer build \
+            --platform=linux/amd64 \
             --image-name=${{ needs.base.outputs.docker_registry }}/${{ steps.tags.outputs.name }}:${{ needs.base.outputs.tag }} \
             --image-name=${{ needs.base.outputs.docker_registry }}/${{ steps.tags.outputs.name }}:latest \
-            --workspace-folder=${{ matrix.img }} \
-            --output=cacheonly
+            --workspace-folder=${{ matrix.img }}
+
+          if [ ${{ github.ref == 'refs/heads/main' }} = "true" ]; then
+            echo "Pushing images"
+
+            docker push ${{ needs.base.outputs.docker_registry }}/${{ steps.tags.outputs.name }}:${{ needs.base.outputs.tag }}
+            docker push ${{ needs.base.outputs.docker_registry }}/${{ steps.tags.outputs.name }}:latest
           fi
