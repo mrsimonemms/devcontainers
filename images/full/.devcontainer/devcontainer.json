@@ -23,5 +23,8 @@
     "ghcr.io/devcontainers/features/ruby:1": {},
     "ghcr.io/devcontainers/features/rust:1": {},
     "ghcr.io/rio/features/skaffold:2": {}
+  },
+  "postCreateCommand": {
+    "pre-commit": "pre-commit install --install-hooks -t pre-commit -t commit-msg"
   }
 }

@@ -12,9 +12,6 @@
       ]
     }
   },
-  "postCreateCommand": {
-    "pre-commit": "pre-commit install --install-hooks -t pre-commit -t commit-msg"
-  },
   "shutdownAction": "stopContainer",
   "remoteUser": "vscode"
 }
