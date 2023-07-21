@@ -1,7 +1,9 @@
 {
   "name": "base",
   "dockerFile": "Dockerfile",
-  "features": {},
+  "features": {
+    "ghcr.io/christophermacgown/devcontainer-features/direnv:1": {}
+  },
   "customizations": {
     "vscode": {
       "extensions": [
@@ -13,5 +15,8 @@
     }
   },
   "shutdownAction": "stopContainer",
-  "remoteUser": "vscode"
+  "remoteUser": "vscode",
+  "postCreateCommand": {
+    "direnv": "direnv allow || true"
+  }
 }
