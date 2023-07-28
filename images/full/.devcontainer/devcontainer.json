@@ -8,7 +8,6 @@
     "ghcr.io/devcontainers/features/go:1": {},
     "ghcr.io/meaningful-ooo/devcontainer-features/homebrew:2": {},
     "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {},
-    "ghcr.io/devcontainers/features/java:1": {},
     "ghcr.io/eitsupi/devcontainer-features/jq-likes:1": {
       "jqVersion": "none",
       "yqVersion": "4",
@@ -18,12 +17,8 @@
     "ghcr.io/rio/features/k9s:1": {},
     "ghcr.io/devcontainers/features/nix:1": {},
     "ghcr.io/devcontainers/features/node:1": {},
-    "ghcr.io/devcontainers/features/php:1": {},
     "ghcr.io/devcontainers-contrib/features/pre-commit:2": {},
-    "ghcr.io/devcontainers/features/python:1": {},
-    "ghcr.io/devcontainers/features/ruby:1": {},
-    "ghcr.io/devcontainers/features/rust:1": {},
-    "ghcr.io/rio/features/skaffold:2": {}
+    "ghcr.io/devcontainers/features/python:1": {}
   },
   "customizations": {
     "vscode": {
