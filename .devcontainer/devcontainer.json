@@ -13,18 +13,8 @@
             "url": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainerFeature.schema.json"
           }
         ]
-      },
-      "extensions": [
-        "donjayamanne.git-extension-pack",
-        "EditorConfig.EditorConfig",
-        "waderyan.gitblame",
-        "GitHub.vscode-github-actions",
-        "ms-vscode.makefile-tools"
-      ]
+      }
     }
-  },
-  "postStartCommand": {
-    "pre-commit": "pre-commit install --install-hooks -t pre-commit -t commit-msg"
   },
   "updateContentCommand": "npm install -g @devcontainers/cli"
 }
