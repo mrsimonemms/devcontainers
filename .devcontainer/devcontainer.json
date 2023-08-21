@@ -16,5 +16,8 @@
       }
     }
   },
+  "postCreateCommand": {
+    "cookieninja-cruft": "pip install cruft"
+  },
   "updateContentCommand": "npm install -g @devcontainers/cli"
 }
