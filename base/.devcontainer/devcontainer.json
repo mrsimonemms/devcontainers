@@ -16,7 +16,18 @@
   },
   "shutdownAction": "stopContainer",
   "remoteUser": "vscode",
+  "initializeCommand": {
+    "ensure-dotfiles": "mkdir -p ${localEnv:HOME}${localEnv:USERPROFILE}/.dotfiles"
+  },
   "postCreateCommand": {
-    "direnv": "direnv allow || true"
-  }
+    "direnv": "direnv allow || true",
+    "exec-dotfiles": "exec-dotfiles"
+  },
+  "mounts": [
+    {
+      "source": "${localEnv:HOME}${localEnv:USERPROFILE}/.dotfiles",
+      "target": "/home/vscode/.dotfiles",
+      "type": "bind"
+    }
+  ]
 }
