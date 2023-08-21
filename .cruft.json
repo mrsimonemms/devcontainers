@@ -1,0 +1,17 @@
+{
+  "template": "https://github.com/mrsimonemms/new",
+  "commit": "7b399837decdab782ba09613a447678ea1f17abb",
+  "checkout": null,
+  "context": {
+    "cookiecutter": {
+      "project_name": "devcontainers",
+      "description": "Prebuilt Dev Container images",
+      "author": "Simon Emms <simon@simonemms.com>",
+      "_template": "https://github.com/mrsimonemms/new"
+    }
+  },
+  "directory": "blank",
+  "skip": [
+    ".git"
+  ]
+}

@@ -10,6 +10,9 @@ Prebuilt Dev Container images
   * [Base](#base)
   * [Full](#full)
 * [Usage](#usage)
+* [Contributing](#contributing)
+  * [Open in Gitpod](#open-in-gitpod)
+  * [Open in a container](#open-in-a-container)
 
 <!-- Regenerate with "pre-commit run -a markdown-toc" -->
 
@@ -68,3 +71,13 @@ this would be by specifying the `image` in your `devcontainer.json` file:
 ```
 
 As this image is pre-built, it will vastly speed up your workflow.
+
+## Contributing
+
+### Open in Gitpod
+
+* [Open in Gitpod](https://gitpod.io/from-referrer/)
+
+### Open in a container
+
+* [Open in a container](https://code.visualstudio.com/docs/devcontainers/containers)

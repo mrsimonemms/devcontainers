@@ -1,0 +1,22 @@
+header:
+  license:
+    spdx-id: Apache-2.0
+    copyright-owner: Simon Emms <simon@simonemms.com>
+  paths-ignore:
+    - dist
+    - tmp
+    - LICENSE
+    - .*
+    - "go.*"
+    - "**/*.{json,md,yml,yaml}"
+    - gitconfig
+  comment: on-failure
+  language:
+    Go:
+      extensions:
+        - ".go"
+      comment_style_id: SlashAsterisk
+
+dependency:
+  files:
+    - go.mod # If this is a Go project.
