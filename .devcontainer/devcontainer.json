@@ -1,7 +1,9 @@
 {
   "name": "devcontainer",
   "image": "ghcr.io/mrsimonemms/devcontainers/full",
-  "features": {},
+  "features": {
+    "ghcr.io/rio/features/chezmoi:1": {}
+  },
   "customizations": {
     "vscode": {
       "settings": {
