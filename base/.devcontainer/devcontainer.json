@@ -2,6 +2,7 @@
   "name": "base",
   "dockerFile": "Dockerfile",
   "features": {
+    "ghcr.io/rio/features/chezmoi:1": {},
     "ghcr.io/christophermacgown/devcontainer-features/direnv:1": {}
   },
   "customizations": {
