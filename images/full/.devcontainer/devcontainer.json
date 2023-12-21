@@ -32,6 +32,7 @@
     }
   },
   "postCreateCommand": {
+    "docker-completion": "docker completion bash | sudo tee -a /etc/bash_completion.d/docker > /dev/null",
     "helm-completion": "helm completion bash | sudo tee -a /etc/bash_completion.d/helm > /dev/null",
     "pre-commit": "pre-commit install --install-hooks -t pre-commit -t commit-msg"
   }
