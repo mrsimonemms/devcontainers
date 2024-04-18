@@ -83,4 +83,5 @@ COPY --chown=vscode:vscode gitconfig .config/git/config
 # Custom PATH additions
 ENV PATH=$HOME/.local/bin:$PATH
 
-WORKDIR /code
+VOLUME [ "/workspaces" ]
+WORKDIR /workspaces
