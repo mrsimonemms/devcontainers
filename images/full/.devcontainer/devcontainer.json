@@ -1,39 +1,26 @@
 {
-  "name": "devcontainers-full",
+  "name": "full",
   "image": "ghcr.io/mrsimonemms/devcontainers/base",
   "features": {
-    "ghcr.io/devcontainers-contrib/features/cookiecutter:2": {},
-    "ghcr.io/ChristopherMacGown/devcontainer-features/direnv:1": {},
-    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
     "ghcr.io/devcontainers/features/go:1": {},
     "ghcr.io/meaningful-ooo/devcontainer-features/homebrew:2": {},
     "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {},
-    "ghcr.io/eitsupi/devcontainer-features/jq-likes:1": {
-      "jqVersion": "none",
-      "yqVersion": "4",
-      "gojqVersion": "none"
-    },
     "ghcr.io/devcontainers-contrib/features/kubectx-kubens:1": {},
     "ghcr.io/rio/features/k9s:1": {},
     "ghcr.io/devcontainers/features/nix:1": {},
     "ghcr.io/devcontainers/features/node:1": {},
     "ghcr.io/devcontainers-contrib/features/pre-commit:2": {},
-    "ghcr.io/devcontainers/features/python:1": {},
-    "ghcr.io/devcontainers-contrib/features/pipx-package:1": {
-      "package": "cruft"
-    }
+    "ghcr.io/devcontainers/features/python:1": {}
   },
   "customizations": {
     "vscode": {
       "extensions": [
-        "golang.Go",
         "ms-kubernetes-tools.vscode-kubernetes-tools"
       ]
     }
   },
   "postCreateCommand": {
-    "docker-completion": "docker completion bash | sudo tee -a /etc/bash_completion.d/docker > /dev/null",
     "helm-completion": "helm completion bash | sudo tee -a /etc/bash_completion.d/helm > /dev/null",
-    "pre-commit": "pre-commit install --install-hooks -t pre-commit -t commit-msg"
+    "pre-commit": "pre-commit install --install-hooks -t pre-commit -t commit-msg || true"
   }
 }
