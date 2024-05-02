@@ -49,3 +49,4 @@ repos:
     rev: v0.8.1
     hooks:
       - id: markdownlint-cli2
+        exclude: ^features
