@@ -1,4 +1,3 @@
-
 # Cobra CLI (cobra-cli)
 
 Install the Cobra CLI

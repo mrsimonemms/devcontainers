@@ -8,8 +8,8 @@
     "version": {
       "type": "string",
       "proposals": [
-          "latest",
-          "v1.3.0"
+        "latest",
+        "v1.3.0"
       ],
       "default": "latest",
       "description": "Select the version you would like to install"
