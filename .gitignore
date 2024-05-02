@@ -7,6 +7,4 @@ node_modules
 .DS_Store
 Thumbs.db
 .commit
-.devbox
 .envrc
-output

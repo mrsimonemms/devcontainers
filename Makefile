@@ -16,12 +16,10 @@ DOCKER_REPO ?= ghcr.io/mrsimonemms/devcontainers
 IMG_DIR = images
 PLATFORM ?= linux/amd64
 
+all: build-all
+
 build-all:
 	@$(MAKE) install-devcontainers
-
-	@if ! command devcontainer --version; then \
-		npm i -g @devcontainers/cli; \
-	fi
 
 	@$(MAKE) build-base build-images
 .PHONY: build-all
@@ -34,11 +32,11 @@ build:
 .PHONY: build
 
 build-base:
-	$(MAKE) build IMG_NAME="base" CONTEXT="base"
+	$(MAKE) build IMG_NAME="base" CONTEXT="${IMG_DIR}/base"
 .PHONY: build-base
 
 build-images:
-	@for img_path in $(shell ls -d ${IMG_DIR}/*); do \
+	@for img_path in $(shell ls -d ${IMG_DIR}/* | grep -v '/base'); do \
 		name=$$(echo $${img_path} | sed "s/${IMG_DIR}\///"); \
 		\
 		$(MAKE) build IMG_NAME="$${name}" CONTEXT="$${img_path}"; \
@@ -51,11 +49,3 @@ install-devcontainers:
 		npm i -g @devcontainers/cli; \
 	fi
 .PHONY: install-devcontainers
-
-cruft-update:
-ifeq (,$(wildcard .cruft.json))
-	@echo "Cruft not configured"
-else
-	@cruft check || cruft update --skip-apply-ask --refresh-private-variables
-endif
-.PHONY: cruft-update
