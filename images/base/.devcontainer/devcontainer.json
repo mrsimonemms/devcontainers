@@ -1,0 +1,30 @@
+{
+  "name": "base",
+  "dockerFile": "Dockerfile",
+  "features": {
+    "ghcr.io/christophermacgown/devcontainer-features/direnv:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/eitsupi/devcontainer-features/jq-likes:1": {
+      "jqVersion": "latest",
+      "yqVersion": "4",
+      "gojqVersion": "none"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "donjayamanne.git-extension-pack",
+        "EditorConfig.EditorConfig",
+        "waderyan.gitblame",
+        "GitHub.vscode-github-actions",
+        "ms-vscode.makefile-tools"
+      ]
+    }
+  },
+  "shutdownAction": "stopContainer",
+  "remoteUser": "vscode",
+  "postCreateCommand": {
+    "docker-completion": "docker completion bash | sudo tee -a /etc/bash_completion.d/docker > /dev/null",
+    "direnv": "direnv allow || true"
+  }
+}

@@ -12,9 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Based on the Gitpod base image
-# @link https://github.com/gitpod-io/workspace-images/blob/main/base/Dockerfile
-
 FROM --platform=${TARGETPLATFORM:-linux/amd64} mcr.microsoft.com/vscode/devcontainers/base:ubuntu
 
 USER root
@@ -31,7 +28,6 @@ RUN apt-get update \
   git-lfs \
   htop \
   iputils-ping \
-  jq \
   less \
   locales \
   lsof \
@@ -83,5 +79,4 @@ COPY --chown=vscode:vscode gitconfig .config/git/config
 # Custom PATH additions
 ENV PATH=$HOME/.local/bin:$PATH
 
-VOLUME [ "/workspaces" ]
 WORKDIR /workspaces
