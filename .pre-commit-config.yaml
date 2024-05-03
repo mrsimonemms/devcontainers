@@ -45,6 +45,7 @@ repos:
     rev: v1.1.1
     hooks:
       - id: markdown-toc
+        exclude: ^features
   - repo: https://github.com/DavidAnson/markdownlint-cli2
     rev: v0.8.1
     hooks:
