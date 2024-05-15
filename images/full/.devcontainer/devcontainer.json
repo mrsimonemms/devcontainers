@@ -10,6 +10,9 @@
     "ghcr.io/devcontainers/features/nix:1": {},
     "ghcr.io/devcontainers/features/node:1": {},
     "ghcr.io/devcontainers-contrib/features/pre-commit:2": {},
+    "ghcr.io/devcontainers-contrib/features/pipx-package:1": {
+      "package": "cruft"
+    },
     "ghcr.io/devcontainers/features/python:1": {}
   },
   "customizations": {
