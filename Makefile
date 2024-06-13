@@ -43,6 +43,14 @@ build-images:
 	done
 .PHONY: build-images
 
+cruft-update:
+ifeq (,$(wildcard .cruft.json))
+	@echo "Cruft not configured"
+else
+	@cruft check || cruft update --skip-apply-ask --refresh-private-variables
+endif
+.PHONY: cruft-update
+
 install-devcontainers:
 	@if ! command devcontainer --version; then \
 		echo "Installing Dev Containers CLI"; \

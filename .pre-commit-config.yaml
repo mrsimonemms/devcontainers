@@ -17,11 +17,11 @@
 
 repos:
   - repo: https://github.com/mrsimonemms/pre-commit-hooks
-    rev: v1.1.0
+    rev: v1.2.0
     hooks:
       - id: license-eye
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v4.6.0
     hooks:
       - id: pretty-format-json
         args:
@@ -36,7 +36,7 @@ repos:
       - id: end-of-file-fixer
       - id: trailing-whitespace
   - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v2.3.0
+    rev: v3.2.0
     hooks:
       - id: conventional-pre-commit
         stages:
@@ -47,7 +47,11 @@ repos:
       - id: markdown-toc
         exclude: ^features
   - repo: https://github.com/DavidAnson/markdownlint-cli2
-    rev: v0.8.1
+    rev: v0.13.0
     hooks:
       - id: markdownlint-cli2
         exclude: ^features
+  - repo: https://github.com/mrsimonemms/toodaloo
+    rev: v0.2.2
+    hooks:
+      - id: scan
