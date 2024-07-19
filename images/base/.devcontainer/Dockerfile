@@ -75,6 +75,7 @@ RUN { echo && echo "PS1='\[\033[01;32m\]\u\[\033[00m\] \[\033[01;34m\]\w\[\033[0
 
 COPY --chown=vscode:vscode bash_aliases .bash_aliases
 COPY --chown=vscode:vscode gitconfig .config/git/config
+COPY --chown=vscode:vscode direnv.toml .config/direnv/direnv.toml
 
 # Custom PATH additions
 ENV PATH=$HOME/.local/bin:$PATH
