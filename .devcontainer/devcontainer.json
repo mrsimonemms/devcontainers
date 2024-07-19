@@ -13,7 +13,10 @@
             "url": "https://raw.githubusercontent.com/devcontainers/spec/main/schemas/devContainerFeature.schema.json"
           }
         ]
-      }
+      },
+      "extensions": [
+        "tamasfe.even-better-toml"
+      ]
     }
   },
   "updateContentCommand": "npm install -g @devcontainers/cli"
