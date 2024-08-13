@@ -24,6 +24,6 @@
   },
   "postCreateCommand": {
     "helm-completion": "helm completion bash | sudo tee -a /etc/bash_completion.d/helm > /dev/null",
-    "pre-commit": "pre-commit install --install-hooks -t pre-commit -t commit-msg || true"
+    "pre-commit": "pre-commit install --install-hooks -t pre-commit -t commit-msg --allow-missing-config || true"
   }
 }
