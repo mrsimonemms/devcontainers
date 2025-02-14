@@ -17,7 +17,8 @@
         "EditorConfig.EditorConfig",
         "waderyan.gitblame",
         "GitHub.vscode-github-actions",
-        "ms-vscode.makefile-tools"
+        "ms-vscode.makefile-tools",
+        "ms-vsliveshare.vsliveshare"
       ]
     }
   },
