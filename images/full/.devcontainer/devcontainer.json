@@ -3,7 +3,6 @@
   "image": "ghcr.io/mrsimonemms/devcontainers/base",
   "features": {
     "ghcr.io/devcontainers/features/go:1": {},
-    "ghcr.io/meaningful-ooo/devcontainer-features/homebrew:2": {},
     "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {},
     "ghcr.io/devcontainers-extra/features/kubectx-kubens:1": {},
     "ghcr.io/rio/features/k9s:1": {},
