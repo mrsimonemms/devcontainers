@@ -20,6 +20,15 @@
       ]
     }
   },
+  "containerEnv": {
+    "PRE_COMMIT_HOME": "/home/vscode/.cache/pre-commit"
+  },
+  "mounts": [
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.cache,target=/home/vscode/.cache,type=bind,consistency=cached"
+  ],
+  "initializeCommand": {
+    "init-pre-commit-cache": "mkdir -p ${localEnv:HOME}${localEnv:USERPROFILE}/.cache"
+  },
   "postCreateCommand": {
     "helm-completion": "helm completion bash | sudo tee -a /etc/bash_completion.d/helm > /dev/null",
     "pre-commit": "pre-commit install --install-hooks -t pre-commit -t commit-msg --allow-missing-config || true"
