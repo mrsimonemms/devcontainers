@@ -1,0 +1,32 @@
+{
+  "name": "temporal_full",
+  "image": "ghcr.io/mrsimonemms/devcontainers/base",
+  "features": {
+    "ghcr.io/devcontainers/features/dotnet:2": {},
+    "ghcr.io/devcontainers/features/go:1": {},
+    "ghcr.io/devcontainers/features/java:1": {},
+    "ghcr.io/devcontainers/features/node:1": {},
+    "ghcr.io/devcontainers/features/php:1": {},
+    "ghcr.io/devcontainers-extra/features/poetry:2": {},
+    "ghcr.io/devcontainers-extra/features/pre-commit:2": {},
+    "ghcr.io/devcontainers-extra/features/pipx-package:1": {
+      "package": "cruft"
+    },
+    "ghcr.io/devcontainers/features/python:1": {},
+    "ghcr.io/devcontainers/features/ruby:1": {},
+    "ghcr.io/devcontainers-extra/features/temporal-cli:1": {}
+  },
+  "containerEnv": {
+    "PRE_COMMIT_HOME": "/home/vscode/.cache/pre-commit",
+    "TEMPORAL_ADDRESS": "localhost:7233"
+  },
+  "mounts": [
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.cache,target=/home/vscode/.cache,type=bind,consistency=cached"
+  ],
+  "initializeCommand": {
+    "init-pre-commit-cache": "mkdir -p ${localEnv:HOME}${localEnv:USERPROFILE}/.cache"
+  },
+  "postCreateCommand": {
+    "pre-commit": "pre-commit install --install-hooks -t pre-commit -t commit-msg --allow-missing-config || true"
+  }
+}
