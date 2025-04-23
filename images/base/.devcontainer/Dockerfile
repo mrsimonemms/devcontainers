@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM --platform=${TARGETPLATFORM:-linux/amd64} mcr.microsoft.com/vscode/devcontainers/base:ubuntu
+FROM mcr.microsoft.com/vscode/devcontainers/base:ubuntu
 
 USER root
 
