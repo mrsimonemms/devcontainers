@@ -35,8 +35,9 @@ fi
 TAG=$(curl -sL "${API_URL}" | grep tag_name | cut -d : -f 2,3 | tr -d \", | tr -d '[:space:]')
 
 echo "Cloning and building tcld"
+mkdir -p "${TCLD_DIR}"
 cd "${TCLD_DIR}"
-git clone "${GIT_REPO}"
+git clone "${GIT_REPO}" "${TCLD_DIR}"
 git checkout "${TAG}"
 make
 mv ./tcld "${TARGET_PATH}"
