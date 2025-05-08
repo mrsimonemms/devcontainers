@@ -1,0 +1,41 @@
+{
+  "name": "Temporal Cloud CLI (tcld)",
+  "id": "tcld",
+  "version": "0.0.0",
+  "description": "A CLI tool for managing Temporal Cloud namespaces.",
+  "options": {
+    "git_repo": {
+      "type": "string",
+      "default": "https://github.com/temporalio/tcld.git",
+      "description": "Git clone repo to use"
+    },
+    "target_path": {
+      "type": "string",
+      "default": "/usr/local/bin",
+      "description": "Location to save the tcld binary"
+    },
+    "version": {
+      "type": "string",
+      "proposals": [
+        "latest",
+        "v0.40.0",
+        "v0.39.0",
+        "v0.38.0",
+        "v0.37.0",
+        "v0.36.0",
+        "v0.34.0",
+        "v0.33.0",
+        "v0.32.0",
+        "v0.31.0",
+        "v0.30.0"
+      ],
+      "default": "latest",
+      "description": "Select the version you would like to install"
+    }
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/go",
+    "ghcr.io/jungaretti/features/make"
+  ]
+}
