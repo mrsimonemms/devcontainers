@@ -26,6 +26,7 @@ This is a series of pre-built Devcontainer image to allow local development.
 ## Features
 
 * [Cobra CLI](./features/cobra-cli)
+* [Temporal Cloud CLI](./features/tcld)
 
 ## Images
 
