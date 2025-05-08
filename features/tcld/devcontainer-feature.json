@@ -33,6 +33,9 @@
       "description": "Select the version you would like to install"
     }
   },
+  "dependsOn": {
+    "ghcr.io/devcontainers/features/go:1": {}
+  },
   "installsAfter": [
     "ghcr.io/devcontainers/features/common-utils",
     "ghcr.io/devcontainers/features/go",
