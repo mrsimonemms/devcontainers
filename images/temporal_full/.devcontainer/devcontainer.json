@@ -15,7 +15,7 @@
     "ghcr.io/devcontainers/features/python:1": {},
     "ghcr.io/devcontainers/features/ruby:1": {},
     "ghcr.io/devcontainers-extra/features/temporal-cli:1": {},
-    "ghcr.io/mrsimonemms/devcontainers/tcld:0": {}
+    "ghcr.io/mrsimonemms/devcontainers/tcld:1": {}
   },
   "containerEnv": {
     "PRE_COMMIT_HOME": "/home/vscode/.cache/pre-commit",
