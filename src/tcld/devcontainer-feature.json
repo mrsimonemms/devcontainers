@@ -34,7 +34,8 @@
     }
   },
   "dependsOn": {
-    "ghcr.io/devcontainers/features/go:1": {}
+    "ghcr.io/devcontainers/features/go:1": {},
+    "ghcr.io/jungaretti/features/make:1": {}
   },
   "installsAfter": [
     "ghcr.io/devcontainers/features/common-utils",
