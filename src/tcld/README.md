@@ -7,7 +7,7 @@ A CLI tool for managing Temporal Cloud namespaces.
 
 ```json
 "features": {
-    "ghcr.io/mrsimonemms/devcontainers/tcld:0": {}
+    "ghcr.io/mrsimonemms/devcontainers/tcld:1": {}
 }
 ```
 
@@ -26,4 +26,4 @@ This feature installs the [Temporal Cloud CLI](https://github.com/temporalio/tcl
 
 ---
 
-_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/mrsimonemms/devcontainers/blob/main/features/tcld/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._
+_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/mrsimonemms/devcontainers/blob/main/src/tcld/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._
