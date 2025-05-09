@@ -1,7 +1,7 @@
 {
   "name": "Temporal Cloud CLI (tcld)",
   "id": "tcld",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A CLI tool for managing Temporal Cloud namespaces.",
   "options": {
     "git_repo": {

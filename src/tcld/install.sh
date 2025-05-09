@@ -39,5 +39,7 @@ mkdir -p "${TCLD_DIR}"
 cd "${TCLD_DIR}"
 git clone "${GIT_REPO}" "${TCLD_DIR}"
 git checkout "${TAG}"
-make
+# make test breaks on linux/arm64 under QEMU
+make clean bins
+./tcld version
 mv ./tcld "${TARGET_PATH}"
