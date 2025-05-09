@@ -19,6 +19,9 @@ GIT_REPO=${GIT_REPO:-"https://github.com/temporalio/tcld.git"}
 VERSION=${VERSION:-"latest"}
 TARGET_PATH=${TARGET_PATH:-"/usr/local/bin"}
 TCLD_DIR=/tmp/tcld
+# Prevent pollution of main /go dir as this is run as sudo
+GOPATH=/tmp/go
+GOCACHE=/tmp/gocache
 
 rm -rf "${TCLD_DIR}"
 
