@@ -14,6 +14,7 @@ Pre-build [Development Containers](https://containers.dev/)
 * [Usage](#usage)
 * [Contributing](#contributing)
   * [Open in a container](#open-in-a-container)
+  * [Commit style](#commit-style)
 
 <!-- Regenerate with "pre-commit run -a markdown-toc" -->
 
@@ -134,3 +135,16 @@ As this image is pre-built, it will vastly speed up your workflow.
 ### Open in a container
 
 * [Open in a container](https://code.visualstudio.com/docs/devcontainers/containers)
+
+### Commit style
+
+All commits must be done in the [Conventional Commit](https://www.conventionalcommits.org)
+format.
+
+```git
+<type>[optional scope]: <description>
+
+[optional body]
+
+[optional footer(s)]
+```
