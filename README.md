@@ -51,11 +51,11 @@ An image with some modern tooling installed.
 * [Go](https://github.com/devcontainers/features/tree/main/src/go) ✅
 * [Kubernetes, Helm and Minikube](https://github.com/devcontainers/features/tree/main/src/kubectl-helm-minikube)
   ✅
-* [Kubectx](https://github.com/devcontainers-contrib/features/tree/main/src/kubectx-kubens)
+* [Kubectx](https://github.com/devcontainers-extra/features/tree/main/src/kubectx-kubens)
   ✅
 * [K9s](https://github.com/rio/features/tree/main/src/k9s) ✅
 * [Node.js](https://github.com/devcontainers/features/tree/main/src/node) ✅
-* [Pre-Commit](https://github.com/devcontainers-contrib/features/tree/main/src/pre-commit)
+* [Pre-Commit](https://github.com/devcontainers-extra/features/tree/main/src/pre-commit)
   ✅
 * [Python](https://github.com/devcontainers/features/tree/main/src/python) ✅
 
@@ -83,7 +83,7 @@ with the minimum Temporal dependencies installed. This image should be used for
 all Temporal work and adding the required [features](https://containers.dev/features)
 in your `.devcontainer/devcontainer.json`.
 
-* [Pre-Commit](https://github.com/devcontainers-contrib/features/tree/main/src/pre-commit)
+* [Pre-Commit](https://github.com/devcontainers-extra/features/tree/main/src/pre-commit)
   ✅
 * [Poetry](https://github.com/devcontainers-extra/features/tree/main/src/poetry)
   ✅
@@ -103,7 +103,7 @@ with native support for all official SDKs.
 * [Java](https://github.com/devcontainers/features/tree/main/src/java) ✅
 * [Node.js](https://github.com/devcontainers/features/tree/main/src/node) ✅
 * [PHP](https://github.com/devcontainers/features/tree/main/src/php) ✅
-* [Pre-Commit](https://github.com/devcontainers-contrib/features/tree/main/src/pre-commit)
+* [Pre-Commit](https://github.com/devcontainers-extra/features/tree/main/src/pre-commit)
   ✅
 * [Poetry](https://github.com/devcontainers-extra/features/tree/main/src/poetry)
   ✅
