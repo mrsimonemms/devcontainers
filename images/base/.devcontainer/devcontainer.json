@@ -4,10 +4,8 @@
   "features": {
     "ghcr.io/christophermacgown/devcontainer-features/direnv:1": {},
     "ghcr.io/devcontainers/features/docker-in-docker:2": {},
-    "ghcr.io/eitsupi/devcontainer-features/jq-likes:1": {
-      "jqVersion": "latest",
-      "yqVersion": "4",
-      "gojqVersion": "none"
+    "ghcr.io/eitsupi/devcontainer-features/jq-likes:2": {
+      "yqVersion": "4"
     }
   },
   "customizations": {
