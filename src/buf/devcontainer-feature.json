@@ -1,0 +1,30 @@
+{
+  "id": "buf",
+  "version": "1.0.0",
+  "name": "Buf CLI (via Github Releases)",
+  "description": "The [Buf CLI](https://buf.build/product/cli) enables building and management of Protobuf APIs - forked from [@marcozac](https://github.com/marcozac/devcontainer-features/tree/main/src/buf).",
+  "documentationURL": "https://github.com/mrsimonemms/devcontainers/tree/main/src/buf",
+  "options": {
+    "version": {
+      "type": "string",
+      "proposals": [
+        "latest"
+      ],
+      "default": "latest",
+      "description": "Select or enter a Buf version."
+    },
+    "installProtocGenBufBreaking": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install also protoc-gen-buf-breaking"
+    },
+    "installProtocGenBufLint": {
+      "type": "boolean",
+      "default": true,
+      "description": "Install also protoc-gen-buf-lint"
+    }
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers-extra/features/gh-release"
+  ]
+}
