@@ -21,7 +21,7 @@
     }
   },
   "shutdownAction": "stopContainer",
-  "remoteUser": "vscode",
+  "remoteUser": "code",
   "postCreateCommand": {
     "docker-completion": "docker completion bash | sudo tee -a /etc/bash_completion.d/docker > /dev/null"
   }

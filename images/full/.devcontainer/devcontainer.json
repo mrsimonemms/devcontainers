@@ -21,10 +21,10 @@
     }
   },
   "containerEnv": {
-    "PRE_COMMIT_HOME": "/home/vscode/.cache/pre-commit"
+    "PRE_COMMIT_HOME": "/home/code/.cache/pre-commit"
   },
   "mounts": [
-    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.cache,target=/home/vscode/.cache,type=bind,consistency=cached"
+    "source=${localEnv:HOME}${localEnv:USERPROFILE}/.cache,target=/home/code/.cache,type=bind,consistency=cached"
   ],
   "initializeCommand": {
     "init-pre-commit-cache": "mkdir -p ${localEnv:HOME}${localEnv:USERPROFILE}/.cache"

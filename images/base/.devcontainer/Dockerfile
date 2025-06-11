@@ -68,14 +68,14 @@ RUN add-apt-repository ppa:aos1/diff-so-fancy \
   && apt-get update \
   && apt-get install -y diff-so-fancy
 
-USER vscode
-WORKDIR /home/vscode
+USER code
+WORKDIR /home/code
 
 RUN { echo && echo "PS1='\[\033[01;32m\]\u\[\033[00m\] \[\033[01;34m\]\w\[\033[00m\]\$(__git_ps1 \" (%s)\") $ '" ; } >> $HOME/.bashrc
 
-COPY --chown=vscode:vscode bash_aliases .bash_aliases
-COPY --chown=vscode:vscode gitconfig .config/git/config
-COPY --chown=vscode:vscode direnv.toml .config/direnv/direnv.toml
+COPY --chown=code:code bash_aliases .bash_aliases
+COPY --chown=code:code gitconfig .config/git/config
+COPY --chown=code:code direnv.toml .config/direnv/direnv.toml
 
 # Custom PATH additions
 ENV PATH=$HOME/.local/bin:$PATH
