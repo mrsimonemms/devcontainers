@@ -21,6 +21,7 @@ RUN apt-get update \
   && apt-get -y install \
   bash-completion \
   build-essential \
+  ca-certificates \
   emacs-nox \
   fish \
   git \
