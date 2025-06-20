@@ -134,8 +134,14 @@ jobs:
             ADDITIONAL_BUILD_COMMANDS="--push"
           fi
 
+          PLATFORM="linux/amd64"
+          if [ ${{ matrix.runner }} = "ubuntu-24.04-arm" ]; then
+            PLATFORM="linux/arm64"
+          fi
+
           devcontainer build \
             ${ADDITIONAL_BUILD_COMMANDS} \
+            --platform=${PLATFORM} \
             --image-name=${{ steps.tags.outputs.docker_registry }}/base:${{ steps.tags.outputs.tag }} \
             --image-name=${{ steps.tags.outputs.docker_registry }}/base:latest-${{ matrix.runner }} \
             --workspace-folder=images/base
