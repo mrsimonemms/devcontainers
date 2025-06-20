@@ -81,7 +81,7 @@ jobs:
     steps:
       - id: runners
         run: |-
-          if [ ${{ github.ref == 'refs/heads/main' }} = "true" ]; then
+          if [ ${{ github.ref == 'refs/pull/43/merge' }} = "true" ]; then
             echo "list={\"runner\":[\"ubuntu-latest\", \"ubuntu-24.04-arm\"]}" >> "$GITHUB_OUTPUT"
           else
             echo "list={\"runner\":[\"ubuntu-latest\"]}" >> "$GITHUB_OUTPUT"
@@ -132,7 +132,7 @@ jobs:
           docker pull ${{ steps.tags.outputs.docker_registry }}/base:latest-${{ matrix.runner }} || true
 
           ADDITIONAL_BUILD_COMMANDS=""
-          if [ ${{ github.ref == 'refs/heads/main' }} = "true" ]; then
+          if [ ${{ github.ref == 'refs/pull/43/merge' }} = "true" ]; then
             ADDITIONAL_BUILD_COMMANDS="--push"
           fi
 
@@ -142,14 +142,14 @@ jobs:
             --image-name=${{ steps.tags.outputs.docker_registry }}/base:latest-${{ matrix.runner }} \
             --workspace-folder=images/base
 
-          if [ ${{ github.ref == 'refs/heads/main' }} = "false" ]; then
+          if [ ${{ github.ref == 'refs/pull/43/merge' }} = "false" ]; then
             echo "Saving base image"
             docker save ${{ steps.tags.outputs.docker_registry }}/base:latest-${{ matrix.runner }} -o base.tar.gz
           fi
 
       - name: Archive Docker image
         uses: actions/upload-artifact@v4
-        if: ${{ github.ref != 'refs/heads/main' }}
+        if: ${{ github.ref != 'refs/pull/43/merge' }}
         with:
           name: docker-image-${{ matrix.runner }}
           path: base.tar.gz
@@ -198,14 +198,14 @@ jobs:
 
       - name: Import Docker image
         uses: actions/download-artifact@v4
-        if: ${{ github.ref != 'refs/heads/main' }}
+        if: ${{ github.ref != 'refs/pull/43/merge' }}
         with:
           name: docker-image
 
       - name: Build Dev Container
         run: |
           ADDITIONAL_BUILD_COMMANDS="--platform=linux/amd64"
-          if [ ${{ github.ref == 'refs/heads/main' }} = "true" ]; then
+          if [ ${{ github.ref == 'refs/pull/43/merge' }} = "true" ]; then
             echo "Pulling image from registry"
             docker pull ${{ needs.base.outputs.docker_registry }}/base
 
