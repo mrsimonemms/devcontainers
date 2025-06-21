@@ -27,6 +27,7 @@ RUN apt-get update \
   git \
   git-core \
   git-lfs \
+  gpg \
   htop \
   iputils-ping \
   less \
@@ -44,6 +45,7 @@ RUN apt-get update \
   time \
   unzip \
   vim \
+  wget \
   zip \
   zsh \
   && locale-gen en_GB.UTF-8
@@ -67,7 +69,19 @@ RUN git lfs install --system --skip-repo
 # @link https://github.com/so-fancy/diff-so-fancy
 RUN add-apt-repository ppa:aos1/diff-so-fancy \
   && apt-get update \
-  && apt-get install -y diff-so-fancy
+  && apt-get install -y diff-so-fancy \
+  && diff-so-fancy --version
+
+# Install direnv
+RUN apt-get install -y direnv \
+  && direnv --version
+
+# Import Microsoft Signing Keys
+# https://learn.microsoft.com/dotnet/core/install/linux-ubuntu#unable-to-locate--some-packages-could-not-be-installed
+RUN sudo wget https://packages.microsoft.com/keys/microsoft.asc \
+  && cat microsoft.asc | gpg --dearmor -o microsoft.asc.gpg \
+  && sudo mv microsoft.asc.gpg /etc/apt/trusted.gpg.d/ \
+  && sudo chown root:root /etc/apt/trusted.gpg.d/microsoft.asc.gpg
 
 USER vscode
 WORKDIR /home/vscode
