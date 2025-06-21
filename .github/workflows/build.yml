@@ -106,8 +106,6 @@ jobs:
 
       - name: Build Dev Container
         run: |
-          docker pull ${{ steps.tags.outputs.docker_registry }}/base:latest || true
-
           ADDITIONAL_BUILD_COMMANDS="--platform=linux/amd64"
           if [ ${{ github.ref == 'refs/pull/44/merge' }} = "true" ]; then
             ADDITIONAL_BUILD_COMMANDS="--platform=linux/amd64,linux/arm64 --push"
@@ -182,16 +180,11 @@ jobs:
         run: |
           ADDITIONAL_BUILD_COMMANDS="--platform=linux/amd64"
           if [ ${{ github.ref == 'refs/pull/44/merge' }} = "true" ]; then
-            echo "Pulling image from registry"
-            docker pull ${{ needs.base.outputs.docker_registry }}/base
-
             ADDITIONAL_BUILD_COMMANDS="--platform=linux/amd64,linux/arm64 --push"
           else
             echo "Importing image from cache"
             docker import base.tar.gz ${{ needs.base.outputs.docker_registry }}/base
           fi
-
-          docker pull ${{ needs.base.outputs.docker_registry }}/${{ steps.tags.outputs.name }}:latest || true
 
           devcontainer build \
             ${ADDITIONAL_BUILD_COMMANDS} \
