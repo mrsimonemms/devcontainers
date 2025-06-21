@@ -67,7 +67,17 @@ RUN git lfs install --system --skip-repo
 # @link https://github.com/so-fancy/diff-so-fancy
 RUN add-apt-repository ppa:aos1/diff-so-fancy \
   && apt-get update \
-  && apt-get install -y diff-so-fancy
+  && apt-get install -y diff-so-fancy \
+  && diff-so-fancy --version
+
+# Install direnv
+RUN apt-get install -y direnv \
+  && direnv --version
+
+# Install yq
+RUN wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq \
+  && chmod +x /usr/local/bin/yq \
+  && yq --version
 
 USER vscode
 WORKDIR /home/vscode
