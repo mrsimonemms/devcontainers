@@ -110,7 +110,7 @@ jobs:
 
           ADDITIONAL_BUILD_COMMANDS="--platform=linux/amd64"
           if [ ${{ github.ref == 'refs/heads/main' }} = "true" ]; then
-            ADDITIONAL_BUILD_COMMANDS="--platform=linux/amd64,linux/arm64 --push"
+            ADDITIONAL_BUILD_COMMANDS="--platform=linux/amd64 --push"
           fi
 
           devcontainer build \
@@ -185,7 +185,7 @@ jobs:
             echo "Pulling image from registry"
             docker pull ${{ needs.base.outputs.docker_registry }}/base
 
-            ADDITIONAL_BUILD_COMMANDS="--platform=linux/amd64,linux/arm64 --push"
+            ADDITIONAL_BUILD_COMMANDS="--platform=linux/amd64 --push"
           else
             echo "Importing image from cache"
             docker import base.tar.gz ${{ needs.base.outputs.docker_registry }}/base
