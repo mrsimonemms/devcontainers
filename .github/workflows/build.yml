@@ -62,15 +62,43 @@ jobs:
 
       - uses: pre-commit/action@v3.0.1
 
-  base:
+  list_images:
     runs-on: ubuntu-latest
+    outputs:
+      list: ${{ steps.tags.outputs.list }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate Docker tag
+        id: tags
+        run: |
+          echo "list={\"img\": $(jq -ncR '[inputs]' <<< $(ls -d images/* | grep -v '/base'))}" >> "$GITHUB_OUTPUT"
+
+  list_runners:
+    runs-on: ubuntu-latest
+    outputs:
+      list: ${{ steps.runners.outputs.list }}
+    steps:
+      - id: runners
+        run: |-
+          if [ ${{ github.ref == 'refs/heads/main' }} = "true" ]; then
+            echo "list={\"runner\":[{\"image\": \"ubuntu-latest\", \"platform\": \"linux/amd64\" }, { \"image\": \"ubuntu-24.04-arm\", \"platform\": \"linux/arm64\" }]}" >> "$GITHUB_OUTPUT"
+          else
+            echo "list={\"runner\":[{\"image\": \"ubuntu-latest\", \"platform\": \"linux/amd64\" }]}" >> "$GITHUB_OUTPUT"
+          fi
+
+  base:
+    runs-on: ${{ matrix.runner.image }}
     needs:
       - commitlint
+      - list_runners
       - pre-commit
     outputs:
       docker_registry: ${{ steps.tags.outputs.docker_registry }}
-      matrix: ${{ steps.tags.outputs.matrix }}
       tag: ${{ steps.tags.outputs.tag }}
+    strategy:
+      fail-fast: true
+      matrix: ${{ fromJSON(needs.list_runners.outputs.list) }}
     steps:
       - uses: actions/checkout@v4
 
@@ -78,9 +106,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -96,7 +121,6 @@ jobs:
         id: tags
         run: |
           echo "docker_registry=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
-          echo "matrix={\"img\": $(jq -ncR '[inputs]' <<< $(ls -d images/* | grep -v '/base'))}" >> "$GITHUB_OUTPUT"
           echo "tag=$(date --iso-8601)" >> "$GITHUB_OUTPUT"
 
       - name: Install Dev Container CLI
@@ -106,41 +130,83 @@ jobs:
 
       - name: Build Dev Container
         run: |
-          docker pull ${{ steps.tags.outputs.docker_registry }}/base:latest || true
-
-          ADDITIONAL_BUILD_COMMANDS="--platform=linux/amd64"
+          ADDITIONAL_BUILD_COMMANDS=""
           if [ ${{ github.ref == 'refs/heads/main' }} = "true" ]; then
-            ADDITIONAL_BUILD_COMMANDS="--platform=linux/amd64 --push"
+            ADDITIONAL_BUILD_COMMANDS="--push"
           fi
 
           devcontainer build \
             ${ADDITIONAL_BUILD_COMMANDS} \
-            --image-name=${{ steps.tags.outputs.docker_registry }}/base:${{ steps.tags.outputs.tag }} \
-            --image-name=${{ steps.tags.outputs.docker_registry }}/base:latest \
+            --platform=${{ matrix.runners.platform }} \
+            --image-name=${{ steps.tags.outputs.docker_registry }}/base:${{ github.sha }}-${{ matrix.runner.image }} \
             --workspace-folder=images/base
 
           if [ ${{ github.ref == 'refs/heads/main' }} = "false" ]; then
             echo "Saving base image"
-            docker save ${{ steps.tags.outputs.docker_registry }}/base:latest -o base.tar.gz
+            docker save ${{ steps.tags.outputs.docker_registry }}/base:${{ github.sha }}-${{ matrix.runner.image }} -o base.tar.gz
           fi
 
       - name: Archive Docker image
         uses: actions/upload-artifact@v4
         if: ${{ github.ref != 'refs/heads/main' }}
         with:
-          name: docker-image
+          name: docker-image-${{ matrix.runner.image }}
           path: base.tar.gz
           if-no-files-found: error
           retention-days: 1
           compression-level: 0
           overwrite: true
 
-  images:
+  base_manifest:
     runs-on: ubuntu-latest
     needs:
       - base
+      - list_runners
+      - list_images
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+    steps:
+      - name: Generate image matrix
+        id: matrix
+        run: |
+          echo ${{ toJson(needs.list_runners.outputs.list) }} | jq -rc > runners.json
+          echo ${{ toJson(needs.list_images.outputs.list) }} | jq -rc > images.json
+
+          echo "matrix=$(jq -c -s 'map(to_entries) | flatten | group_by(.key) | map({key: .[0].key, value: map(.value) | add}) | from_entries' <<< "$(cat runners.json)$(cat images.json)")" >> "$GITHUB_OUTPUT"
+
+          inputs=""
+          for row in $(cat runners.json | jq -rc '.runner[] | @base64'); do
+            inputs="${inputs},${{ needs.base.outputs.docker_registry }}/base:${{ github.sha }}-$(echo "${row}" | base64 -d | jq -r '.image')"
+          done
+
+          echo "inputs=${inputs}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: Noelware/docker-manifest-action@v1
+        if: ${{ github.ref == 'refs/heads/main' }}
+        with:
+          inputs: ${{ steps.matrix.outputs.inputs }}
+          tags:  ${{ needs.base.outputs.docker_registry }}/base:${{ needs.base.outputs.tag }},${{ needs.base.outputs.docker_registry }}/base:latest
+          push: true
+          annotations: index:org.opencontainers.image.source=https://github.com/${{ github.repository }}
+
+  images:
+    runs-on: ${{ matrix.runner.image }}
+    needs:
+      - base
+      - base_manifest
     strategy:
-      matrix: ${{ fromJSON(needs.base.outputs.matrix) }}
+      fail-fast: true
+      matrix: ${{ fromJSON(needs.base_manifest.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v4
 
@@ -148,9 +214,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -176,25 +239,64 @@ jobs:
         uses: actions/download-artifact@v4
         if: ${{ github.ref != 'refs/heads/main' }}
         with:
-          name: docker-image
+          name: docker-image-${{ matrix.runner.image }}
 
       - name: Build Dev Container
         run: |
-          ADDITIONAL_BUILD_COMMANDS="--platform=linux/amd64"
+          ADDITIONAL_BUILD_COMMANDS=""
           if [ ${{ github.ref == 'refs/heads/main' }} = "true" ]; then
-            echo "Pulling image from registry"
-            docker pull ${{ needs.base.outputs.docker_registry }}/base
-
-            ADDITIONAL_BUILD_COMMANDS="--platform=linux/amd64 --push"
+            ADDITIONAL_BUILD_COMMANDS="--push"
           else
             echo "Importing image from cache"
             docker import base.tar.gz ${{ needs.base.outputs.docker_registry }}/base
           fi
 
-          docker pull ${{ needs.base.outputs.docker_registry }}/${{ steps.tags.outputs.name }}:latest || true
-
           devcontainer build \
             ${ADDITIONAL_BUILD_COMMANDS} \
-            --image-name=${{ needs.base.outputs.docker_registry }}/${{ steps.tags.outputs.name }}:${{ needs.base.outputs.tag }} \
-            --image-name=${{ needs.base.outputs.docker_registry }}/${{ steps.tags.outputs.name }}:latest \
+            --platform=${{ matrix.runners.platform }} \
+            --image-name=${{ needs.base.outputs.docker_registry }}/${{ steps.tags.outputs.name }}:${{ github.sha }}-${{ matrix.runner.image }} \
             --workspace-folder=${{ matrix.img }}
+
+  images_manifest:
+    runs-on: ubuntu-latest
+    needs:
+      - base
+      - list_images
+      - list_runners
+      - images
+    strategy:
+      fail-fast: true
+      matrix: ${{ fromJSON(needs.list_images.outputs.list) }}
+    steps:
+      - name: Generate Docker tag
+        id: tags
+        run: |
+          img_name=$(echo ${{ matrix.img }} | sed 's/images\///')
+          echo "name=${img_name}" >> "$GITHUB_OUTPUT"
+
+          echo ${{ toJson(needs.list_runners.outputs.list) }} | jq -rc > runners.json
+
+          inputs=""
+          for row in $(cat runners.json | jq -rc '.runner[] | @base64'); do
+            inputs="${inputs},${{ needs.base.outputs.docker_registry }}/${img_name}:${{ github.sha }}-$(echo "${row}" | base64 -d | jq -r '.image')"
+          done
+
+          echo "inputs=${inputs}" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: Noelware/docker-manifest-action@v1
+        if: ${{ github.ref == 'refs/heads/main' }}
+        with:
+          inputs: ${{ steps.tags.outputs.inputs }}
+          tags:  ${{ needs.base.outputs.docker_registry }}/base:${{ needs.base.outputs.tag }},${{ needs.base.outputs.docker_registry }}/base:latest
+          push: true
+          annotations: index:org.opencontainers.image.source=https://github.com/${{ github.repository }}

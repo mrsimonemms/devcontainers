@@ -23,6 +23,7 @@ RUN apt-get update \
   bash-completion \
   build-essential \
   ca-certificates \
+  direnv \
   emacs-nox \
   fish \
   git \
