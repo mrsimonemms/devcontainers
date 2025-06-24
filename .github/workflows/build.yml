@@ -301,3 +301,5 @@ jobs:
           tags: ${{ needs.base.outputs.docker_registry }}/${{ steps.tags.outputs.name }}:${{ needs.base.outputs.tag }},${{ needs.base.outputs.docker_registry }}/${{ steps.tags.outputs.name }}:latest
           push: true
           annotations: index:org.opencontainers.image.source=https://github.com/${{ github.repository }}
+
+# to remove
