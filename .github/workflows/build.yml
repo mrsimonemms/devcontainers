@@ -195,7 +195,7 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
           inputs: ${{ steps.matrix.outputs.inputs }}
-          tags:  ${{ needs.base.outputs.docker_registry }}/base:${{ needs.base.outputs.tag }},${{ needs.base.outputs.docker_registry }}/base:latest
+          tags: ${{ needs.base.outputs.docker_registry }}/base:${{ needs.base.outputs.tag }},${{ needs.base.outputs.docker_registry }}/base:latest
           push: true
           annotations: index:org.opencontainers.image.source=https://github.com/${{ github.repository }}
 
@@ -282,6 +282,7 @@ jobs:
           done
 
           echo "inputs=${inputs}" >> "$GITHUB_OUTPUT"
+          echo "name=${img_name}" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -297,6 +298,6 @@ jobs:
         if: ${{ github.ref == 'refs/heads/main' }}
         with:
           inputs: ${{ steps.tags.outputs.inputs }}
-          tags:  ${{ needs.base.outputs.docker_registry }}/base:${{ needs.base.outputs.tag }},${{ needs.base.outputs.docker_registry }}/base:latest
+          tags: ${{ needs.base.outputs.docker_registry }}/${{ steps.tags.outputs.name }}:${{ needs.base.outputs.tag }},${{ needs.base.outputs.docker_registry }}/${{ steps.tags.outputs.name }}:latest
           push: true
           annotations: index:org.opencontainers.image.source=https://github.com/${{ github.repository }}
