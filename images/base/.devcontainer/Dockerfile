@@ -74,6 +74,12 @@ RUN add-apt-repository ppa:aos1/diff-so-fancy \
 USER vscode
 WORKDIR /home/vscode
 
+# Configure direnv
+# @link https://direnv.net/docs/hook.html
+RUN touch $HOME/.bashrc $HOME/.zshrc \
+  && echo 'eval "$(direnv hook bash)"' >> $HOME/.bashrc \
+  && echo 'eval "$(direnv hook zsh)"' >> $HOME/.zshrc
+
 RUN { echo && echo "PS1='\[\033[01;32m\]\u\[\033[00m\] \[\033[01;34m\]\w\[\033[00m\]\$(__git_ps1 \" (%s)\") $ '" ; } >> $HOME/.bashrc
 
 COPY --chown=vscode:vscode bash_aliases .bash_aliases
