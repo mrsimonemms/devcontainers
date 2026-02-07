@@ -27,27 +27,40 @@ if [[ "$INSTALL_PROTOC_GEN_BUF_LINT" == "true" ]]; then
     binary_names="$binary_names,protoc-gen-buf-lint"
 fi
 
-source ./library_scripts.sh
+BIN="/usr/local/bin"
+REPO_OWNER="bufbuild"
+REPO_NAME="buf"
+VERSION="${VERSION:-"latest"}" # Default to latest if not set
 
-# nanolayer is a cli utility which keeps container layers as small as possible
-# source code: https://github.com/devcontainers-contrib/nanolayer
-# `ensure_nanolayer` is a bash function that will find any existing nanolayer installations,
-# and if missing - will download a temporary copy that automatically get deleted at the end
-# of the script
-ensure_nanolayer nanolayer_location "v0.4.45"
+# Resolve "latest" to a real tag
+if [ "${VERSION}" = "latest" ]; then
+    echo "Fetching latest version from GitHub..."
+    API_URL="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/latest"
 
-$nanolayer_location \
-    install \
-    devcontainer-feature \
-    "ghcr.io/devcontainers-extra/features/gh-release:1.0.26" \
-        --option repo='bufbuild/buf' \
-        --option binaryNames="$binary_names" \
-        --option version="$VERSION" \
-        --option assetRegex='.*\.tar\.gz' \
-        --option libName='buf'
+    # Extract tag_name from JSON response
+    VERSION=$(curl -sL "${API_URL}" | grep '"tag_name":' | cut -d : -f 2,3 | tr -d \", | tr -d '[:space:]')
 
-rm /usr/local/bin/buf
+    if [ -z "${VERSION}" ]; then
+        echo "Error: Failed to fetch the latest version tag from GitHub."
+        exit 1
+    fi
+fi
 
-ln -s /usr/local/lib/buf/buf/bin/buf /usr/local/bin/buf
+VERSION="${VERSION#v}"
+IFS=',' read -ra BINARIES <<< "$binary_names"
+
+for binary in "${BINARIES[@]}"; do
+    echo "Downloading ${binary}..."
+    DOWNLOAD_URL="https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/download/v${VERSION}/${binary}-$(uname -s)-$(uname -m)"
+
+    if ! curl -fsSL "$DOWNLOAD_URL" -o "${BIN}/${binary}"; then
+        echo "Error: Failed to download ${binary} version v${VERSION}."
+        echo "URL: ${DOWNLOAD_URL}"
+        rm -f "${BIN}/${binary}"
+        exit 1
+    fi
+
+    chmod +x "${BIN}/${binary}"
+done
 
 echo 'Done!'
