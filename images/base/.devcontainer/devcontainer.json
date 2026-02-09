@@ -23,7 +23,9 @@
         "waderyan.gitblame",
         "GitHub.vscode-github-actions",
         "ms-vscode.makefile-tools",
-        "ms-vsliveshare.vsliveshare"
+        "ms-vsliveshare.vsliveshare",
+        "Anthropic.claude-code",
+        "openai.chatgpt"
       ]
     }
   },
