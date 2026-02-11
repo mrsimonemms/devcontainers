@@ -1,6 +1,6 @@
 {
   "id": "buf",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": "Buf CLI (via Github Releases)",
   "description": "The [Buf CLI](https://buf.build/product/cli) enables building and management of Protobuf APIs - forked from [@marcozac](https://github.com/marcozac/devcontainer-features/tree/main/src/buf).",
   "documentationURL": "https://github.com/mrsimonemms/devcontainers/tree/main/src/buf",
