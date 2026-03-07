@@ -137,7 +137,7 @@ jobs:
 
           devcontainer build \
             ${ADDITIONAL_BUILD_COMMANDS} \
-            --platform=${{ matrix.runners.platform }} \
+            --platform=${{ matrix.runner.platform }} \
             --image-name=${{ steps.tags.outputs.docker_registry }}/base:${{ github.sha }}-${{ matrix.runner.image }} \
             --workspace-folder=images/base
 
@@ -253,7 +253,7 @@ jobs:
 
           devcontainer build \
             ${ADDITIONAL_BUILD_COMMANDS} \
-            --platform=${{ matrix.runners.platform }} \
+            --platform=${{ matrix.runner.platform }} \
             --image-name=${{ needs.base.outputs.docker_registry }}/${{ steps.tags.outputs.name }}:${{ github.sha }}-${{ matrix.runner.image }} \
             --workspace-folder=${{ matrix.img }}
 
