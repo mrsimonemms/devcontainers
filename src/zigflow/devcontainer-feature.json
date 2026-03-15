@@ -1,0 +1,22 @@
+{
+  "name": "Zigflow",
+  "version": "1.0.0",
+  "id": "zigflow",
+  "description": "A Temporal DSL for turning declarative YAML into production-ready workflows",
+  "options": {
+    "version": {
+      "type": "string",
+      "proposals": [
+        "latest"
+      ],
+      "default": "latest",
+      "description": "Select the version you would like to install"
+    }
+  },
+  "dependsOn": {
+    "ghcr.io/devcontainers-extra/features/temporal-cli:1": {}
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers-extra/features/gh-release"
+  ]
+}
