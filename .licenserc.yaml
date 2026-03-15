@@ -12,6 +12,7 @@ header:
     - "**/*.{json,md,yml,yaml}"
     - gitconfig
     - "**/.gitkeep"
+    - "src/zigflow"
   comment: on-failure
   language:
     Go:

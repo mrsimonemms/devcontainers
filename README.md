@@ -29,6 +29,7 @@ This is a series of pre-built Devcontainer image to allow local development.
 * [Buf](./src/buf)
 * [Cobra CLI](./src/cobra-cli)
 * [Temporal Cloud CLI](./src/tcld)
+* [Zigflow](./src/zigflow)
 
 ## Images
 
