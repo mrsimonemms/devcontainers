@@ -1,6 +1,6 @@
 {
   "name": "Zigflow",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "id": "zigflow",
   "description": "A Temporal DSL for turning declarative YAML into production-ready workflows",
   "options": {
