@@ -15,6 +15,6 @@ $nanolayer_location \
     install \
     devcontainer-feature \
     "ghcr.io/devcontainers-extra/features/gh-release:1.0.25" \
-    --option repo='zigflow/zigflow' --option binaryNames='zigflow' --option version="$VERSION"
+    --option repo='zigflow/zigflow' --option binaryNames='zigflow' --option assetRegex='\.tar\.gz$' --option version="$VERSION"
 
 echo 'Done!'
