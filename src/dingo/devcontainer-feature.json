@@ -1,0 +1,27 @@
+{
+  "name": "Dingo",
+  "version": "1.0.0",
+  "id": "dingo",
+  "description": "A meta-language for Go that adds Result types, error propagation (?), and pattern matching while maintaining 100% Go ecosystem compatibility",
+  "options": {
+    "version": {
+      "type": "string",
+      "proposals": [
+        "latest"
+      ],
+      "default": "latest",
+      "description": "Select the version you would like to install"
+    }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "MadAppGang.dingo"
+      ]
+    }
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers/features/common-utils",
+    "ghcr.io/devcontainers/features/go"
+  ]
+}
