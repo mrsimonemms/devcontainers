@@ -1,3 +1,4 @@
+
 # Dingo (dingo)
 
 A meta-language for Go that adds Result types, error propagation (?), and pattern matching while maintaining 100% Go ecosystem compatibility
@@ -15,6 +16,12 @@ A meta-language for Go that adds Result types, error propagation (?), and patter
 | Options Id | Description | Type | Default Value |
 |-----|-----|-----|-----|
 | version | Select the version you would like to install | string | latest |
+
+## Customizations
+
+### VS Code Extensions
+
+- `MadAppGang.dingo`
 
 ## Dingo
 
