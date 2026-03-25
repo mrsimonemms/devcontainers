@@ -26,8 +26,10 @@ This is a series of pre-built Devcontainer image to allow local development.
 
 ## Features
 
+* [Air](./src/air)
 * [Buf](./src/buf)
 * [Cobra CLI](./src/cobra-cli)
+* [Dingo](./src/dingo)
 * [Temporal Cloud CLI](./src/tcld)
 * [Zigflow](./src/zigflow)
 
