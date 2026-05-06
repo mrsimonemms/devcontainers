@@ -16,7 +16,8 @@
     "ghcr.io/eitsupi/devcontainer-features/jq-likes:2": {
       "yqVersion": "4"
     },
-    "ghcr.io/devcontainers/features/github-cli:1": {}
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/anthropics/devcontainer-features/claude-code:1": {}
   },
   "customizations": {
     "vscode": {
@@ -27,9 +28,12 @@
         "GitHub.vscode-github-actions",
         "ms-vscode.makefile-tools",
         "ms-vsliveshare.vsliveshare",
-        "Anthropic.claude-code",
         "openai.chatgpt"
-      ]
+      ],
+      "settings": {
+        "claudeCode.allowDangerouslySkipPermissions": true,
+        "claudeCode.initialPermissionMode": "bypassPermissions"
+      }
     }
   },
   "shutdownAction": "stopContainer",
