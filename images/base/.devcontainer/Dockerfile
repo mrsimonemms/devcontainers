@@ -71,6 +71,10 @@ RUN add-apt-repository ppa:aos1/diff-so-fancy \
   && apt-get update \
   && apt-get install -y diff-so-fancy
 
+# Add default managed settings for Claude
+RUN mkdir -p /etc/claude-code
+COPY claude-managed-settings.json /etc/claude-code/managed-settings.json
+
 USER vscode
 WORKDIR /home/vscode
 
