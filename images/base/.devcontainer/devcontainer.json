@@ -11,7 +11,7 @@
       "username": "none"
     },
     "ghcr.io/devcontainers/features/docker-in-docker:2": {
-      "version": "28"
+      "moby": false
     },
     "ghcr.io/eitsupi/devcontainer-features/jq-likes:2": {
       "yqVersion": "4"
