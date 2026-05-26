@@ -1,0 +1,19 @@
+{
+  "name": "diff-so-fancy",
+  "version": "1.0.0",
+  "id": "diff-so-fancy",
+  "description": "The best-looking diffs",
+  "options": {
+    "version": {
+      "type": "string",
+      "proposals": [
+        "latest"
+      ],
+      "default": "latest",
+      "description": "Select the version you would like to install"
+    }
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers-extra/features/gh-release"
+  ]
+}
