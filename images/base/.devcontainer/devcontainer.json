@@ -16,7 +16,8 @@
     "ghcr.io/eitsupi/devcontainer-features/jq-likes:2": {
       "yqVersion": "4"
     },
-    "ghcr.io/devcontainers/features/github-cli:1": {}
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/mrsimonemms/devcontainers/diff-so-fancy:1": {}
   },
   "customizations": {
     "vscode": {
