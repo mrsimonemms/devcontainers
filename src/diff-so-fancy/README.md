@@ -1,3 +1,4 @@
+
 # diff-so-fancy (diff-so-fancy)
 
 The best-looking diffs
