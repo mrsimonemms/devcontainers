@@ -37,6 +37,22 @@
       }
     }
   },
+  "mounts": [
+    {
+      "source": "${localEnv:HOME}${localEnv:USERPROFILE}/.claude",
+      "target": "/home/vscode/.claude",
+      "type": "bind"
+    },
+    {
+      "source": "${localEnv:HOME}${localEnv:USERPROFILE}/.codex",
+      "target": "/home/vscode/.codex",
+      "type": "bind"
+    }
+  ],
+  "initializeCommand": {
+    "init-claude": "mkdir -p ${localEnv:HOME}${localEnv:USERPROFILE}/.claude",
+    "init-codex": "mkdir -p ${localEnv:HOME}${localEnv:USERPROFILE}/.codex"
+  },
   "shutdownAction": "stopContainer",
   "remoteUser": "vscode",
   "postCreateCommand": {
