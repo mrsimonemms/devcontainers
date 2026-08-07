@@ -1,0 +1,19 @@
+{
+  "name": "Butane",
+  "version": "1.0.0",
+  "id": "butane",
+  "description": "Butane translates human-readable Butane Configs into machine-readable Ignition Configs.",
+  "options": {
+    "version": {
+      "type": "string",
+      "proposals": [
+        "latest"
+      ],
+      "default": "latest",
+      "description": "Select the version you would like to install"
+    }
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers-extra/features/gh-release"
+  ]
+}
