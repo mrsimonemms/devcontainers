@@ -10,8 +10,6 @@ Pre-build [Development Containers](https://containers.dev/)
   * [Base](#base)
   * [Full](#full)
   * [Temporal Min](#temporal-min)
-  * [Temporal Full](#temporal-full)
-* [Usage](#usage)
 * [Contributing](#contributing)
   * [Open in a container](#open-in-a-container)
   * [Commit style](#commit-style)
@@ -94,45 +92,6 @@ in your `.devcontainer/devcontainer.json`.
 * [Python](https://github.com/devcontainers/features/tree/main/src/python) ✅
 * [Temporal CLI](https://github.com/devcontainers-extra/features/tree/main/src/temporal-cli)
   ✅
-
-### Temporal Full
-
-> `ghcr.io/mrsimonemms/devcontainers/temporal_full`
-
-An image designed to make working with [Temporal](https://temporal.io/) easier,
-with native support for all official SDKs.
-
-* [Dotnet](https://github.com/devcontainers/features/tree/main/src/dotnet)
-* [Go](https://github.com/devcontainers/features/tree/main/src/go) ✅
-* [Java](https://github.com/devcontainers/features/tree/main/src/java) ✅
-* [Node.js](https://github.com/devcontainers/features/tree/main/src/node) ✅
-* [PHP](https://github.com/devcontainers/features/tree/main/src/php) ✅
-* [Pre-Commit](https://github.com/devcontainers-extra/features/tree/main/src/pre-commit)
-  ✅
-* [Poetry](https://github.com/devcontainers-extra/features/tree/main/src/poetry)
-  ✅
-* [Python](https://github.com/devcontainers/features/tree/main/src/python) ✅
-* [Ruby](https://github.com/devcontainers/features/tree/main/src/ruby) ✅
-* [Temporal CLI](https://github.com/devcontainers-extra/features/tree/main/src/temporal-cli)
-  ✅
-
-This image is quite large. Unless full support for everything is required,
-use the [Temporal Min](#temporal-min) image and adding the required [features](https://containers.dev/features)
-in your `.devcontainer/devcontainer.json`.
-
-## Usage
-
-These images can be used in any way that Dev Containers supports. Typically,
-this would be by specifying the `image` in your `devcontainer.json` file:
-
-```json
-{
-  "name": "devcontainer",
-  "image": "ghcr.io/mrsimonemms/devcontainers/full"
-}
-```
-
-As this image is pre-built, it will vastly speed up your workflow.
 
 ## Contributing
 
