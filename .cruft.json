@@ -1,6 +1,6 @@
 {
   "template": "https://github.com/mrsimonemms/new",
-  "commit": "12e795a5cac56f7b4525274df94dbd947930187f",
+  "commit": "6f9d354501373017c05fcf905450cfb9647ff8bf",
   "checkout": null,
   "context": {
     "cookiecutter": {
@@ -8,7 +8,7 @@
       "description": "Prebuilt Dev Container images",
       "author": "Simon Emms <simon@simonemms.com>",
       "_template": "https://github.com/mrsimonemms/new",
-      "_commit": "12e795a5cac56f7b4525274df94dbd947930187f"
+      "_commit": "6f9d354501373017c05fcf905450cfb9647ff8bf"
     }
   },
   "directory": "blank",
