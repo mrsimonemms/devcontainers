@@ -21,7 +21,7 @@ jobs:
   commitlint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0 # fetch-depth is required
 
@@ -30,7 +30,7 @@ jobs:
   pre-commit:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0 # fetch-depth is required
 
@@ -39,6 +39,7 @@ jobs:
         if: ${{ hashFiles('go.mod') == '' }}
         with:
           check-latest: true
+          go-version: ">= 1.26"
 
       - name: Set up Go with go.mod
         uses: actions/setup-go@v6
@@ -67,7 +68,7 @@ jobs:
     outputs:
       list: ${{ steps.tags.outputs.list }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Generate Docker tag
         id: tags
@@ -100,7 +101,7 @@ jobs:
       fail-fast: true
       matrix: ${{ fromJSON(needs.list_runners.outputs.list) }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Setup JS
         uses: actions/setup-node@v6
@@ -207,7 +208,7 @@ jobs:
       fail-fast: true
       matrix: ${{ fromJSON(needs.base_manifest.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Setup JS
         uses: actions/setup-node@v6
