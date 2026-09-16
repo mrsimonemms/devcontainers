@@ -26,7 +26,9 @@ This is a series of pre-built Devcontainer image to allow local development.
 
 * [Air](./src/air)
 * [Buf](./src/buf)
+* [Butane](./src/butane)
 * [Cobra CLI](./src/cobra-cli)
+* [Diff So Fancy](./src/diff-so-fancy)
 * [Dingo](./src/dingo)
 * [Temporal Cloud CLI](./src/tcld)
 * [Zigflow](./src/zigflow)
