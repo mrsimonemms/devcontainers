@@ -1,0 +1,19 @@
+{
+  "name": "Floci",
+  "version": "1.0.0",
+  "id": "floci",
+  "description": "Any cloud. Locally.",
+  "options": {
+    "version": {
+      "type": "string",
+      "proposals": [
+        "latest"
+      ],
+      "default": "latest",
+      "description": "Select the version you would like to install"
+    }
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers-extra/features/gh-release"
+  ]
+}
