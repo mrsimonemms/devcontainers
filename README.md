@@ -30,6 +30,7 @@ This is a series of pre-built Devcontainer image to allow local development.
 * [Cobra CLI](./src/cobra-cli)
 * [Diff So Fancy](./src/diff-so-fancy)
 * [Dingo](./src/dingo)
+* [Floci](./src/floci)
 * [Temporal Cloud CLI](./src/tcld)
 * [Zigflow](./src/zigflow)
 
