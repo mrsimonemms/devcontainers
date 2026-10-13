@@ -1,7 +1,7 @@
 
 # Floci (floci)
 
-Any Cloud. Locally.
+Any cloud. Locally.
 
 ## Example Usage
 
