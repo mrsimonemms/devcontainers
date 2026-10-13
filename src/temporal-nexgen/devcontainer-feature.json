@@ -1,0 +1,19 @@
+{
+  "name": "Temporal NexGen",
+  "version": "1.0.0",
+  "id": "temporal-nexgen",
+  "description": "Generate models and Nexus service definitions for Go, Java, Python, and TypeScript from schema definition files.",
+  "options": {
+    "version": {
+      "type": "string",
+      "proposals": [
+        "latest"
+      ],
+      "default": "latest",
+      "description": "Select the version you would like to install"
+    }
+  },
+  "installsAfter": [
+    "ghcr.io/devcontainers-extra/features/gh-release"
+  ]
+}
