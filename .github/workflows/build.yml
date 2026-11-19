@@ -123,11 +123,16 @@ jobs:
           devcontainer --version
 
       - name: Test feature
-        run: |
-          devcontainer features test \
-            --features ${{ matrix.feature }} \
-            --base-image mcr.microsoft.com/devcontainers/base:ubuntu \
-            .
+        uses: nick-fields/retry@v4
+        with:
+          max_attempts: 3
+          retry_wait_seconds: 30
+          timeout_minutes: 30
+          command: |
+            devcontainer features test \
+              --features ${{ matrix.feature }} \
+              --base-image mcr.microsoft.com/devcontainers/base:ubuntu \
+              .
 
   base:
     runs-on: ${{ matrix.runner.image }}
