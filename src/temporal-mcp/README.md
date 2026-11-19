@@ -24,4 +24,4 @@ This Feature installs [the Temporal MCP CLI](https://github.com/temporalio/tempo
 
 ---
 
-_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/mrsimonemms/devcontainers/blob/main/src/temporal-nexgen/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._
+_Note: This file was auto-generated from the [devcontainer-feature.json](https://github.com/mrsimonemms/devcontainers/blob/main/src/temporal-mcp/devcontainer-feature.json).  Add additional notes to a `NOTES.md`._
