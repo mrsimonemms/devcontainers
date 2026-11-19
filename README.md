@@ -13,6 +13,9 @@ Pre-build [Development Containers](https://containers.dev/)
 * [Contributing](#contributing)
   * [Open in a container](#open-in-a-container)
   * [Commit style](#commit-style)
+  * [Testing](#testing)
+    * [Testing all features](#testing-all-features)
+    * [Testing a single feature](#testing-a-single-feature)
 
 <!-- Regenerate with "pre-commit run -a markdown-toc" -->
 
@@ -32,6 +35,7 @@ This is a series of pre-built Devcontainer image to allow local development.
 * [Dingo](./src/dingo)
 * [Floci](./src/floci)
 * [Temporal Cloud CLI](./src/tcld)
+* [Temporal NexGen](./src/temporal-nexgen/)
 * [Zigflow](./src/zigflow)
 
 ## Images
@@ -113,4 +117,18 @@ format.
 [optional body]
 
 [optional footer(s)]
+```
+
+### Testing
+
+#### Testing all features
+
+```sh
+make test
+```
+
+#### Testing a single feature
+
+```sh
+make test FEATURE=<feature-name>
 ```
