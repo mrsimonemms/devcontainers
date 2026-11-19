@@ -39,7 +39,7 @@ jobs:
 
           # Add / update and commit
           git add */**/README.md
-          git commit -m "${message}" || export NO_UPDATES=true
+          git commit --signoff -m "${message}" || export NO_UPDATES=true
 
           # Push
           if [ "$NO_UPDATES" != "true" ] ; then
