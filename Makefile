@@ -15,6 +15,8 @@
 DOCKER_REPO ?= ghcr.io/mrsimonemms/devcontainers
 IMG_DIR = images
 PLATFORM ?= linux/amd64
+# Self-contained Feature tree used for testing and publishing
+STAGE_DIR ?= .build/staged
 
 all: build-all
 
@@ -58,8 +60,12 @@ install-devcontainers:
 	fi
 .PHONY: install-devcontainers
 
-test:
-	@devcontainer features test \
+stage:
+	@./scripts/stage-features.sh ${STAGE_DIR}
+.PHONY: stage
+
+test: stage
+	@devcontainer features test ${STAGE_DIR} \
 		--base-image mcr.microsoft.com/devcontainers/base:ubuntu \
 		$(if ${FEATURE},--features ${FEATURE})
 .PHONY: test

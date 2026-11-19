@@ -15,6 +15,8 @@
 
 set -e
 
+. ./library_scripts.sh
+
 GIT_REPO=${GIT_REPO:-"https://github.com/temporalio/tcld.git"}
 VERSION=${VERSION:-"latest"}
 TARGET_PATH=${TARGET_PATH:-"/usr/local/bin"}
@@ -26,22 +28,28 @@ GOCACHE=/tmp/gocache
 rm -rf "${TCLD_DIR}"
 
 if [ "${VERSION}" = "latest" ]; then
-  echo "Getting latest tag version"
+  # "latest" always means the latest official tcld release
+  echo "Getting latest tcld release"
 
-  API_URL=https://api.github.com/repos/temporalio/tcld/releases/latest
+  if ! TAG=$(github_latest_release_tag "temporalio/tcld"); then
+    echo "Error: unable to resolve the latest tcld release" >&2
+    exit 1
+  fi
 else
-  echo "Getting tag version for ${VERSION}"
-
-  API_URL="https://api.github.com/repos/temporalio/tcld/releases/tags/${VERSION}"
+  # Explicit versions are used directly as a tag in the configured repository
+  TAG="${VERSION}"
 fi
 
-TAG=$(curl -sL "${API_URL}" | grep tag_name | cut -d : -f 2,3 | tr -d \", | tr -d '[:space:]')
+echo "Using tag ${TAG} from ${GIT_REPO}"
+
+if ! git ls-remote --exit-code --tags "${GIT_REPO}" "refs/tags/${TAG}" >/dev/null; then
+  echo "Error: tag '${TAG}' not found in ${GIT_REPO}" >&2
+  exit 1
+fi
 
 echo "Cloning and building tcld"
-mkdir -p "${TCLD_DIR}"
+git clone --depth 1 --branch "${TAG}" "${GIT_REPO}" "${TCLD_DIR}"
 cd "${TCLD_DIR}"
-git clone "${GIT_REPO}" "${TCLD_DIR}"
-git checkout "${TAG}"
 # make test breaks on linux/arm64 under QEMU
 make clean bins
 ./tcld version

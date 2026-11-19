@@ -128,11 +128,7 @@ jobs:
           max_attempts: 3
           retry_wait_seconds: 30
           timeout_minutes: 30
-          command: |
-            devcontainer features test \
-              --features ${{ matrix.feature }} \
-              --base-image mcr.microsoft.com/devcontainers/base:ubuntu \
-              .
+          command: make test FEATURE=${{ matrix.feature }}
 
   base:
     runs-on: ${{ matrix.runner.image }}
