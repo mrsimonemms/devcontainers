@@ -42,13 +42,40 @@ fi
 
 echo "Using tag ${TAG} from ${GIT_REPO}"
 
-if ! git ls-remote --exit-code --tags "${GIT_REPO}" "refs/tags/${TAG}" >/dev/null; then
-  echo "Error: tag '${TAG}' not found in ${GIT_REPO}" >&2
-  exit 1
-fi
+# Retry git network operations a bounded number of times
+GIT_MAX_ATTEMPTS=3
+
+attempt=1
+while true; do
+  rc=0
+  git ls-remote --exit-code --tags "${GIT_REPO}" "refs/tags/${TAG}" >/dev/null || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    break
+  elif [ "${rc}" -eq 2 ]; then
+    # --exit-code returns 2 when the repository has no matching ref
+    echo "Error: tag '${TAG}' not found in ${GIT_REPO}" >&2
+    exit 1
+  elif [ "${attempt}" -ge "${GIT_MAX_ATTEMPTS}" ]; then
+    echo "Error: unable to reach ${GIT_REPO} after ${attempt} attempts" >&2
+    exit 1
+  fi
+  echo "Warning: git ls-remote failed (exit ${rc}), retrying in $((attempt * 5))s" >&2
+  sleep $((attempt * 5))
+  attempt=$((attempt + 1))
+done
 
 echo "Cloning and building tcld"
-git clone --depth 1 --branch "${TAG}" "${GIT_REPO}" "${TCLD_DIR}"
+attempt=1
+until git clone --depth 1 --branch "${TAG}" "${GIT_REPO}" "${TCLD_DIR}"; do
+  if [ "${attempt}" -ge "${GIT_MAX_ATTEMPTS}" ]; then
+    echo "Error: unable to clone ${GIT_REPO} at ${TAG} after ${attempt} attempts" >&2
+    exit 1
+  fi
+  echo "Warning: git clone failed, retrying in $((attempt * 5))s" >&2
+  sleep $((attempt * 5))
+  rm -rf "${TCLD_DIR}"
+  attempt=$((attempt + 1))
+done
 cd "${TCLD_DIR}"
 # make test breaks on linux/arm64 under QEMU
 make clean bins

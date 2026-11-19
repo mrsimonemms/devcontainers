@@ -1,0 +1,10 @@
+{
+  "explicit_version": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "butane": {
+        "version": "0.28.0"
+      }
+    }
+  }
+}

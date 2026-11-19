@@ -4,6 +4,9 @@ set -e
 
 . ./library_scripts.sh
 
-install_gh_release_binary 'zigflow/zigflow' 'zigflow' "$VERSION"
+arch=$(release_arch x86_64 arm64)
+
+install_github_release_binary 'zigflow/zigflow' zigflow "$VERSION" \
+    "zigflow_linux_${arch}"
 
 echo 'Done!'

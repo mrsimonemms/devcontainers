@@ -17,6 +17,11 @@ set -e
 
 . ./library_scripts.sh
 
-install_gh_release_binary 'MadAppGang/dingo' 'dingo' "$VERSION"
+arch=$(release_arch amd64 arm64)
+
+# Releases from v0.9.0 use a fixed asset name; earlier ones include the tag
+install_github_release_binary 'MadAppGang/dingo' dingo "$VERSION" \
+    "dingo-linux-${arch}" \
+    "dingo-{tag}-linux-${arch}"
 
 echo 'Done!'

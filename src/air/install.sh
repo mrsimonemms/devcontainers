@@ -17,6 +17,9 @@ set -e
 
 . ./library_scripts.sh
 
-install_gh_release_binary 'air-verse/air' 'air' "$VERSION" --option assetRegex='\.tar\.gz$'
+arch=$(release_arch amd64 arm64)
+
+install_github_release_binary 'air-verse/air' air "$VERSION" \
+    "air_{version}_linux_${arch}.tar.gz"
 
 echo 'Done!'

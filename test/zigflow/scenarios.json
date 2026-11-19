@@ -1,0 +1,10 @@
+{
+  "explicit_version": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "zigflow": {
+        "version": "v0.18.0"
+      }
+    }
+  }
+}

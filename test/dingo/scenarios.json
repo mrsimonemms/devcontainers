@@ -1,0 +1,10 @@
+{
+  "explicit_version": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "dingo": {
+        "version": "v0.3.0"
+      }
+    }
+  }
+}

@@ -17,6 +17,27 @@ set -e
 
 . ./library_scripts.sh
 
-install_gh_release_binary 'temporalio/nexgen' 'nexgen' "$VERSION"
+arch=$(release_arch x86_64 aarch64)
+
+if [ "${VERSION}" = "latest" ]; then
+    # Every nexgen release is a prerelease, which GitHub's releases/latest
+    # redirect ignores. The public releases feed lists them newest first.
+    ensure_curl
+    feed=$(mktemp)
+    if ! http_fetch "https://github.com/temporalio/nexgen/releases.atom" "$feed"; then
+        echo "Error: could not fetch the nexgen releases feed" >&2
+        exit 1
+    fi
+    VERSION=$(grep -oE '/releases/tag/[^"]+' "$feed" | head -n 1 | sed 's|.*/releases/tag/||')
+    rm -f "$feed"
+    if [ -z "${VERSION}" ]; then
+        echo "Error: could not resolve the latest nexgen release" >&2
+        exit 1
+    fi
+    echo "Resolved latest nexgen release: ${VERSION}"
+fi
+
+install_github_release_binary 'temporalio/nexgen' nexgen "$VERSION" \
+    "nexgen-{tag}-${arch}-unknown-linux-gnu.tar.gz"
 
 echo 'Done!'
