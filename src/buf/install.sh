@@ -16,6 +16,8 @@
 
 set -e
 
+. ./library_scripts.sh
+
 INSTALL_PROTOC_GEN_BUF_BREAKING="${INSTALLPROTOCGENBUFBREAKING:-"true"}"
 INSTALL_PROTOC_GEN_BUF_LINT="${INSTALLPROTOCGENBUFLINT:-"true"}"
 
@@ -35,12 +37,8 @@ VERSION="${VERSION:-"latest"}" # Default to latest if not set
 # Resolve "latest" to a real tag
 if [ "${VERSION}" = "latest" ]; then
     echo "Fetching latest version from GitHub..."
-    API_URL="https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/releases/latest"
 
-    # Extract tag_name from JSON response
-    VERSION=$(curl -sL "${API_URL}" | grep '"tag_name":' | cut -d : -f 2,3 | tr -d \", | tr -d '[:space:]')
-
-    if [ -z "${VERSION}" ]; then
+    if ! VERSION=$(github_latest_release_tag "${REPO_OWNER}/${REPO_NAME}"); then
         echo "Error: Failed to fetch the latest version tag from GitHub."
         exit 1
     fi

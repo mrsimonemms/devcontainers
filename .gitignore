@@ -10,3 +10,6 @@ Thumbs.db
 .envrc
 
 .claude
+
+# Staged Features (scripts/stage-features.sh)
+.build

@@ -1,3 +1,17 @@
+# Copyright 2023 Simon Emms <simon@simonemms.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 clean_download() {
     # The purpose of this function is to download a file with minimal impact on container layer size
     # this means if no valid downloader is found (curl or wget) then we install a downloader (currently wget) in a
@@ -165,4 +179,79 @@ ensure_nanolayer() {
     # Expose outside the resolved location
     export ${variable_name}=$__nanolayer_location
 
+}
+
+# Shared helpers for the Features in this repository.
+#
+# This is the only copy of this file in the repository. scripts/stage-features.sh
+# (`make stage`) copies it alongside each install.sh that sources it, so every
+# published Feature is self-contained and can install from GHCR on its own.
+
+install_gh_release_binary() {
+    # Install binaries from a GitHub release using nanolayer and the
+    # devcontainers-extra gh-release Feature.
+    #
+    # Usage: install_gh_release_binary <owner/repo> <binaryNames> <version> [extra nanolayer args...]
+    # Example: install_gh_release_binary 'air-verse/air' 'air' "$VERSION" --option assetRegex='\.tar\.gz$'
+    #
+    # Note: gh-release looks up release assets through the anonymous GitHub
+    # REST API, so it is subject to its rate limits.
+    local repo=$1
+    local binary_names=$2
+    local version=$3
+    shift 3
+
+    # nanolayer is a cli utility which keeps container layers as small as possible
+    # source code: https://github.com/devcontainers-extra/nanolayer
+    # `ensure_nanolayer` will find any existing nanolayer installations, and if
+    # missing - will download a temporary copy that automatically get deleted at
+    # the end of the script
+    ensure_nanolayer nanolayer_location "v0.5.6"
+
+    "$nanolayer_location" \
+        install \
+        devcontainer-feature \
+        "ghcr.io/devcontainers-extra/features/gh-release:1.0.25" \
+        --option repo="$repo" --option binaryNames="$binary_names" --option version="$version" \
+        "$@"
+}
+
+github_latest_release_tag() {
+    # Print the tag of the latest GitHub release for a repository.
+    #
+    # Usage: github_latest_release_tag <owner/repo>
+    #
+    # This follows the github.com/<owner>/<repo>/releases/latest redirect rather
+    # than calling the anonymous REST API, so it is not subject to its rate
+    # limits. Returns non-zero with an error message if the tag can't be found.
+    local repo=$1
+    local url
+    local tag
+
+    if ! type curl >/dev/null 2>&1; then
+        echo "Error: curl is required to resolve the latest release of ${repo}" >&2
+        return 1
+    fi
+
+    if ! url=$(curl -fsSL -o /dev/null -w '%{url_effective}' "https://github.com/${repo}/releases/latest"); then
+        echo "Error: failed to reach https://github.com/${repo}/releases/latest" >&2
+        return 1
+    fi
+
+    case "$url" in
+        */releases/tag/*)
+            tag=${url##*/releases/tag/}
+            ;;
+        *)
+            echo "Error: could not resolve the latest release of ${repo} (redirected to ${url})" >&2
+            return 1
+            ;;
+    esac
+
+    if [ -z "$tag" ]; then
+        echo "Error: could not resolve the latest release of ${repo}" >&2
+        return 1
+    fi
+
+    echo "$tag"
 }

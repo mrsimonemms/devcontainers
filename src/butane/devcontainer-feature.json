@@ -1,6 +1,6 @@
 {
   "name": "Butane",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "id": "butane",
   "description": "Butane translates human-readable Butane Configs into machine-readable Ignition Configs.",
   "options": {
