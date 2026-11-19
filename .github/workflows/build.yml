@@ -88,6 +88,47 @@ jobs:
             echo "list={\"runner\":[{\"image\": \"ubuntu-latest\", \"platform\": \"linux/amd64\" }]}" >> "$GITHUB_OUTPUT"
           fi
 
+  list_features:
+    runs-on: ubuntu-latest
+    outputs:
+      list: ${{ steps.features.outputs.list }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: List features with tests
+        id: features
+        run: |
+          echo "list=$(find test -mindepth 2 -maxdepth 2 -name test.sh -printf '%h\n' 2>/dev/null | xargs -r -n1 basename | sort | jq -ncR '[inputs]')" >> "$GITHUB_OUTPUT"
+
+  test_features:
+    runs-on: ubuntu-latest
+    needs:
+      - list_features
+    if: ${{ needs.list_features.outputs.list != '[]' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        feature: ${{ fromJSON(needs.list_features.outputs.list) }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup JS
+        uses: actions/setup-node@v6
+        with:
+          node-version: lts/*
+
+      - name: Install Dev Container CLI
+        run: |
+          npm install -g @devcontainers/cli
+          devcontainer --version
+
+      - name: Test feature
+        run: |
+          devcontainer features test \
+            --features ${{ matrix.feature }} \
+            --base-image mcr.microsoft.com/devcontainers/base:ubuntu \
+            .
+
   base:
     runs-on: ${{ matrix.runner.image }}
     needs:

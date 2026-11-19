@@ -18,6 +18,22 @@ set -e
 
 . ./library_scripts.sh
 
+# diff-so-fancy is a Perl script and needs the full Perl distribution (not
+# just perl-base) for its UTF-8 I/O support
+if ! perl -e 'use open ":encoding(UTF-8)"' >/dev/null 2>&1; then
+    echo "Installing Perl"
+    if command -v apt-get >/dev/null 2>&1; then
+        apt-get update -y
+        apt-get install -y --no-install-recommends perl
+        rm -rf /var/lib/apt/lists/*
+    elif command -v apk >/dev/null 2>&1; then
+        apk add --no-cache perl
+    else
+        echo "Error: Perl is required but no supported package manager was found"
+        exit 1
+    fi
+fi
+
 # nanolayer is a cli utility which keeps container layers as small as possible
 # source code: https://github.com/devcontainers-extra/nanolayer
 # `ensure_nanolayer` is a bash function that will find any existing nanolayer installations,

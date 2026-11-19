@@ -1,0 +1,11 @@
+{
+  "no_plugins": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "buf": {
+        "installProtocGenBufBreaking": false,
+        "installProtocGenBufLint": false
+      }
+    }
+  }
+}
