@@ -12,238 +12,239 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-clean_download() {
-    # The purpose of this function is to download a file with minimal impact on container layer size
-    # this means if no valid downloader is found (curl or wget) then we install a downloader (currently wget) in a
-    # temporary manner, and making sure to
-    # 1. uninstall the downloader at the return of the function
-    # 2. revert back any changes to the package installer database/cache (for example apt-get lists)
-    # The above steps will minimize the leftovers being created while installing the downloader
-    # Supported distros:
-    #  debian/ubuntu/alpine
-
-    url=$1
-    output_location=$2
-    tempdir=$(mktemp -d)
-    downloader_installed=""
-
-    _apt_get_install() {
-        tempdir=$1
-
-        # copy current state of apt list - in order to revert back later (minimize contianer layer size)
-        cp -p -R /var/lib/apt/lists $tempdir
-        apt-get update -y
-        apt-get -y install --no-install-recommends wget ca-certificates
-    }
-
-    _apt_get_cleanup() {
-        tempdir=$1
-
-        echo "removing wget"
-        apt-get -y purge wget --auto-remove
-
-        echo "revert back apt lists"
-        rm -rf /var/lib/apt/lists/*
-        rm -r /var/lib/apt/lists && mv $tempdir/lists /var/lib/apt/lists
-    }
-
-    _apk_install() {
-        tempdir=$1
-        # copy current state of apk cache - in order to revert back later (minimize contianer layer size)
-        cp -p -R /var/cache/apk $tempdir
-
-        apk add --no-cache  wget
-    }
-
-    _apk_cleanup() {
-        tempdir=$1
-
-        echo "removing wget"
-        apk del wget
-    }
-    # try to use either wget or curl if one of them already installer
-    if type curl >/dev/null 2>&1; then
-        downloader=curl
-    elif type wget >/dev/null 2>&1; then
-        downloader=wget
-    else
-        downloader=""
-    fi
-
-    # in case none of them is installed, install wget temporarly
-    if [ -z $downloader ] ; then
-        if [ -x "/usr/bin/apt-get" ] ; then
-            _apt_get_install $tempdir
-        elif [ -x "/sbin/apk" ] ; then
-            _apk_install $tempdir
-        else
-            echo "distro not supported"
-            exit 1
-        fi
-        downloader="wget"
-        downloader_installed="true"
-    fi
-
-    if [ $downloader = "wget" ] ; then
-        wget -q $url -O $output_location
-    else
-        curl -sfL $url -o $output_location
-    fi
-
-    # NOTE: the cleanup procedure was not implemented using `trap X RETURN` only because
-    # alpine lack bash, and RETURN is not a valid signal under sh shell
-    if ! [ -z $downloader_installed  ] ; then
-        if [ -x "/usr/bin/apt-get" ] ; then
-            _apt_get_cleanup $tempdir
-        elif [ -x "/sbin/apk" ] ; then
-            _apk_cleanup $tempdir
-        else
-            echo "distro not supported"
-            exit 1
-        fi
-    fi
-
-}
-
-
-ensure_nanolayer() {
-    # Ensure existance of the nanolayer cli program
-    local variable_name=$1
-
-    local required_version=$2
-
-    local __nanolayer_location=""
-
-    # If possible - try to use an already installed nanolayer
-    if [ -z "${NANOLAYER_FORCE_CLI_INSTALLATION}" ]; then
-        if [ -z "${NANOLAYER_CLI_LOCATION}" ]; then
-            if type nanolayer >/dev/null 2>&1; then
-                echo "Found a pre-existing nanolayer in PATH"
-                __nanolayer_location=nanolayer
-            fi
-        elif [ -f "${NANOLAYER_CLI_LOCATION}" ] && [ -x "${NANOLAYER_CLI_LOCATION}" ] ; then
-            __nanolayer_location=${NANOLAYER_CLI_LOCATION}
-            echo "Found a pre-existing nanolayer which were given in env variable: $__nanolayer_location"
-        fi
-
-        # make sure its of the required version
-        if ! [ -z "${__nanolayer_location}" ]; then
-            local current_version
-            current_version=$($__nanolayer_location --version)
-
-
-            if ! [ $current_version == $required_version ]; then
-                echo "skipping usage of pre-existing nanolayer. (required version $required_version does not match existing version $current_version)"
-                __nanolayer_location=""
-            fi
-        fi
-
-    fi
-
-    # If not previuse installation found, download it temporarly and delete at the end of the script
-    if [ -z "${__nanolayer_location}" ]; then
-
-        if [ "$(uname -sm)" = 'Linux x86_64' ] || [ "$(uname -sm)" = "Linux aarch64" ]; then
-            tmp_dir=$(mktemp -d -t nanolayer-XXXXXXXXXX)
-
-            clean_up () {
-                ARG=$?
-                rm -rf $tmp_dir
-                exit $ARG
-            }
-            trap clean_up EXIT
-
-
-            if [ -x "/sbin/apk" ] ; then
-                clib_type=musl
-            else
-                clib_type=gnu
-            fi
-
-            tar_filename=nanolayer-"$(uname -m)"-unknown-linux-$clib_type.tgz
-
-            # clean download will minimize leftover in case a downloaderlike wget or curl need to be installed
-            clean_download https://github.com/devcontainers-extra/nanolayer/releases/download/$required_version/$tar_filename $tmp_dir/$tar_filename
-
-            tar xfzv $tmp_dir/$tar_filename -C "$tmp_dir"
-            chmod a+x $tmp_dir/nanolayer
-            __nanolayer_location=$tmp_dir/nanolayer
-
-
-        else
-            echo "No binaries compiled for non-x86-linux architectures yet: $(uname -m)"
-            exit 1
-        fi
-    fi
-
-    # Expose outside the resolved location
-    export ${variable_name}=$__nanolayer_location
-
-}
-
 # Shared helpers for the Features in this repository.
 #
 # This is the only copy of this file in the repository. scripts/stage-features.sh
 # (`make stage`) copies it alongside each install.sh that sources it, so every
 # published Feature is self-contained and can install from GHCR on its own.
+#
+# Release binaries are downloaded from GitHub's public release URLs rather than
+# discovered through the anonymous GitHub REST API, which is heavily rate
+# limited. Every network request is retried individually with a bounded budget.
 
-install_gh_release_binary() {
-    # Install binaries from a GitHub release using nanolayer and the
-    # devcontainers-extra gh-release Feature.
+# Maximum attempts per request and the total seconds a single request may spend
+# waiting between attempts
+GITHUB_HTTP_MAX_ATTEMPTS=${GITHUB_HTTP_MAX_ATTEMPTS:-5}
+GITHUB_HTTP_RETRY_BUDGET=${GITHUB_HTTP_RETRY_BUDGET:-120}
+# Where release binaries are installed
+GITHUB_RELEASE_BIN_DIR=${GITHUB_RELEASE_BIN_DIR:-/usr/local/bin}
+
+ensure_curl() {
+    # Install curl and CA certificates if curl isn't available
+    if type curl >/dev/null 2>&1; then
+        return 0
+    fi
+
+    echo "Installing curl"
+    if [ -x /usr/bin/apt-get ]; then
+        apt-get update -y
+        apt-get install -y --no-install-recommends curl ca-certificates
+        rm -rf /var/lib/apt/lists/*
+    elif [ -x /sbin/apk ]; then
+        apk add --no-cache curl ca-certificates
+    else
+        echo "Error: curl is required and no supported package manager was found" >&2
+        return 1
+    fi
+}
+
+release_arch() {
+    # Print the upstream name for this machine's architecture.
     #
-    # Usage: install_gh_release_binary <owner/repo> <binaryNames> <version> [extra nanolayer args...]
-    # Example: install_gh_release_binary 'air-verse/air' 'air' "$VERSION" --option assetRegex='\.tar\.gz$'
+    # Usage: release_arch <x86_64 name> <aarch64 name>
+    # Example: release_arch amd64 arm64
+    case "$(uname -m)" in
+        x86_64 | amd64)
+            echo "$1"
+            ;;
+        aarch64 | arm64)
+            echo "$2"
+            ;;
+        *)
+            echo "Error: unsupported architecture $(uname -m). Supported: x86_64, aarch64" >&2
+            return 1
+            ;;
+    esac
+}
+
+_http_header() {
+    # Print the value of a header from the last response in a curl header dump
+    local file=$1
+    local name=$2
+    tr -d '\r' <"$file" | awk -v name="$name" '
+        /^HTTP\// { value = "" }
+        tolower($0) ~ "^" name ":" { sub(/^[^:]*:[ \t]*/, ""); value = $0 }
+        END { print value }
+    '
+}
+
+_http_is_transient_curl_error() {
+    # curl exit codes worth retrying: DNS, connect, HTTP/2, partial transfer,
+    # timeout, TLS handshake, empty reply, send/receive and stream errors
+    case "$1" in
+        5 | 6 | 7 | 16 | 18 | 28 | 35 | 52 | 55 | 56 | 92) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+http_fetch() {
+    # Fetch a URL with bounded, per-request retries.
     #
-    # Note: gh-release looks up release assets through the anonymous GitHub
-    # REST API, so it is subject to its rate limits.
-    local repo=$1
-    local binary_names=$2
-    local version=$3
-    shift 3
+    # Usage: http_fetch <url> <output-file> [--no-follow]
+    #
+    # Retries transport errors and 408/429/500/502/503/504 responses with
+    # exponential backoff. Rate limits honour Retry-After or the
+    # X-RateLimit-Reset time; if the wait exceeds the retry budget it fails with
+    # the reset time. 404 fails immediately.
+    #
+    # Sets HTTP_STATUS and HTTP_REDIRECT_URL.
+    # Returns 0 on success (2xx, or 3xx with --no-follow), 2 on 404, 1 otherwise.
+    local url=$1
+    local output=$2
+    local follow_flag="-L"
+    if [ "${3:-}" = "--no-follow" ]; then
+        follow_flag=""
+    fi
 
-    # nanolayer is a cli utility which keeps container layers as small as possible
-    # source code: https://github.com/devcontainers-extra/nanolayer
-    # `ensure_nanolayer` will find any existing nanolayer installations, and if
-    # missing - will download a temporary copy that automatically get deleted at
-    # the end of the script
-    ensure_nanolayer nanolayer_location "v0.5.6"
+    local headers
+    headers=$(mktemp)
+    local attempt=1
+    local waited=0
+    local backoff=2
+    local curl_rc write_out wait reason retry_after remaining reset now reset_note
 
-    "$nanolayer_location" \
-        install \
-        devcontainer-feature \
-        "ghcr.io/devcontainers-extra/features/gh-release:1.0.25" \
-        --option repo="$repo" --option binaryNames="$binary_names" --option version="$version" \
-        "$@"
+    while true; do
+        curl_rc=0
+        # shellcheck disable=SC2086
+        write_out=$(curl -sS $follow_flag --connect-timeout 15 --max-time 600 \
+            -D "$headers" -o "$output" -w '%{http_code} %{redirect_url}' "$url") || curl_rc=$?
+        HTTP_STATUS=${write_out%% *}
+        HTTP_REDIRECT_URL=${write_out#* }
+        wait=""
+        reset_note=""
+
+        if [ "$curl_rc" -ne 0 ]; then
+            if ! _http_is_transient_curl_error "$curl_rc"; then
+                echo "Error: request to ${url} failed (curl exit ${curl_rc})" >&2
+                rm -f "$headers"
+                return 1
+            fi
+            reason="transport error (curl exit ${curl_rc})"
+        else
+            case "$HTTP_STATUS" in
+                2??)
+                    rm -f "$headers"
+                    return 0
+                    ;;
+                3??)
+                    if [ -z "$follow_flag" ]; then
+                        rm -f "$headers"
+                        return 0
+                    fi
+                    echo "Error: unexpected redirect status ${HTTP_STATUS} from ${url}" >&2
+                    rm -f "$headers"
+                    return 1
+                    ;;
+                404)
+                    rm -f "$headers"
+                    return 2
+                    ;;
+                403 | 429)
+                    retry_after=$(_http_header "$headers" retry-after)
+                    remaining=$(_http_header "$headers" x-ratelimit-remaining)
+                    reset=$(_http_header "$headers" x-ratelimit-reset)
+                    now=$(date +%s)
+                    if [ -n "$reset" ]; then
+                        reset_note=" (rate limit resets at $(date -u -d "@${reset}" '+%Y-%m-%dT%H:%M:%SZ' 2>/dev/null || echo "epoch ${reset}"))"
+                    fi
+
+                    if [ -n "$retry_after" ]; then
+                        case "$retry_after" in
+                            *[!0-9]*) wait=$(($(date -u -d "$retry_after" +%s 2>/dev/null || echo "$now") - now)) ;;
+                            *) wait=$retry_after ;;
+                        esac
+                    elif [ "$remaining" = "0" ] && [ -n "$reset" ]; then
+                        wait=$((reset - now))
+                    elif [ "$HTTP_STATUS" = "429" ]; then
+                        wait=$backoff
+                    else
+                        echo "Error: access denied (HTTP 403) for ${url}" >&2
+                        rm -f "$headers"
+                        return 1
+                    fi
+                    if [ "$wait" -lt 1 ]; then
+                        wait=1
+                    fi
+                    reason="rate limited (HTTP ${HTTP_STATUS})${reset_note}"
+                    ;;
+                408 | 500 | 502 | 503 | 504)
+                    retry_after=$(_http_header "$headers" retry-after)
+                    case "$retry_after" in
+                        '' | *[!0-9]*) wait=$backoff ;;
+                        *) wait=$retry_after ;;
+                    esac
+                    reason="HTTP ${HTTP_STATUS}"
+                    ;;
+                *)
+                    echo "Error: request to ${url} failed with HTTP ${HTTP_STATUS}" >&2
+                    rm -f "$headers"
+                    return 1
+                    ;;
+            esac
+        fi
+
+        if [ -z "$wait" ]; then
+            wait=$backoff
+        fi
+
+        if [ "$attempt" -ge "$GITHUB_HTTP_MAX_ATTEMPTS" ]; then
+            echo "Error: ${url} failed after ${attempt} attempts: ${reason}" >&2
+            rm -f "$headers"
+            return 1
+        fi
+
+        if [ $((waited + wait)) -gt "$GITHUB_HTTP_RETRY_BUDGET" ]; then
+            echo "Error: ${url} failed: ${reason}. Waiting ${wait}s would exceed the ${GITHUB_HTTP_RETRY_BUDGET}s retry budget" >&2
+            rm -f "$headers"
+            return 1
+        fi
+
+        echo "Warning: ${url} failed: ${reason}. Retrying in ${wait}s (attempt $((attempt + 1)) of ${GITHUB_HTTP_MAX_ATTEMPTS})" >&2
+        sleep "$wait"
+        waited=$((waited + wait))
+        attempt=$((attempt + 1))
+        backoff=$((backoff * 2))
+    done
 }
 
 github_latest_release_tag() {
-    # Print the tag of the latest GitHub release for a repository.
+    # Print the tag of the latest (non-prerelease) GitHub release.
     #
     # Usage: github_latest_release_tag <owner/repo>
     #
-    # This follows the github.com/<owner>/<repo>/releases/latest redirect rather
-    # than calling the anonymous REST API, so it is not subject to its rate
-    # limits. Returns non-zero with an error message if the tag can't be found.
+    # Follows the public github.com/<owner>/<repo>/releases/latest redirect
+    # rather than calling the REST API.
     local repo=$1
-    local url
+    local rc=0
     local tag
 
-    if ! type curl >/dev/null 2>&1; then
-        echo "Error: curl is required to resolve the latest release of ${repo}" >&2
+    ensure_curl || return 1
+
+    http_fetch "https://github.com/${repo}/releases/latest" /dev/null --no-follow || rc=$?
+    if [ "$rc" -eq 2 ]; then
+        echo "Error: repository ${repo} not found" >&2
+        return 1
+    elif [ "$rc" -ne 0 ]; then
+        echo "Error: could not resolve the latest release of ${repo}" >&2
         return 1
     fi
 
-    if ! url=$(curl -fsSL -o /dev/null -w '%{url_effective}' "https://github.com/${repo}/releases/latest"); then
-        echo "Error: failed to reach https://github.com/${repo}/releases/latest" >&2
-        return 1
-    fi
-
-    case "$url" in
+    case "$HTTP_REDIRECT_URL" in
         */releases/tag/*)
-            tag=${url##*/releases/tag/}
+            tag=${HTTP_REDIRECT_URL##*/releases/tag/}
             ;;
         *)
-            echo "Error: could not resolve the latest release of ${repo} (redirected to ${url})" >&2
+            echo "Error: ${repo} has no latest release (redirected to ${HTTP_REDIRECT_URL:-nowhere})" >&2
             return 1
             ;;
     esac
@@ -254,4 +255,142 @@ github_latest_release_tag() {
     fi
 
     echo "$tag"
+}
+
+github_release_download() {
+    # Download a release asset from GitHub's public download URL.
+    #
+    # Usage: github_release_download <owner/repo> <tag|latest> <asset> <output-file>
+    #
+    # "latest" uses /releases/latest/download/<asset>, so it only suits assets
+    # whose names don't change between releases.
+    # Returns 0 on success, 2 if the asset (or tag) doesn't exist, 1 otherwise.
+    local repo=$1
+    local tag=$2
+    local asset=$3
+    local output=$4
+    local url
+
+    if [ "$tag" = "latest" ]; then
+        url="https://github.com/${repo}/releases/latest/download/${asset}"
+    else
+        url="https://github.com/${repo}/releases/download/${tag}/${asset}"
+    fi
+
+    echo "Downloading ${url}"
+    http_fetch "$url" "$output"
+}
+
+_github_release_tag_exists() {
+    local repo=$1
+    local tag=$2
+    http_fetch "https://github.com/${repo}/releases/tag/${tag}" /dev/null
+}
+
+install_github_release_binary() {
+    # Download a release asset and install a binary from it.
+    #
+    # Usage: install_github_release_binary <owner/repo> <binary> <version> <asset> [<asset>...]
+    #
+    # <asset> is the asset file name for this machine. It may contain {tag}
+    # (the release tag) and {version} (the tag without a leading "v"). Several
+    # asset names can be given; they are tried in order and the first that
+    # exists is used.
+    #
+    # <version> is "latest" or an explicit release tag; an explicit version is
+    # tried as given and then with the leading "v" added or removed. When every
+    # asset name is fixed, "latest" downloads from /releases/latest/download.
+    # Otherwise "latest" is resolved through the public releases/latest
+    # redirect first.
+    #
+    # .tar.gz/.tgz assets are extracted and <binary> found inside; any other
+    # asset is installed as the binary itself.
+    local repo=$1
+    local binary=$2
+    local version=$3
+    shift 3
+    local assets=("$@")
+
+    local templated=false
+    local asset
+    for asset in "${assets[@]}"; do
+        case "$asset" in
+            *'{tag}'* | *'{version}'*) templated=true ;;
+        esac
+    done
+
+    ensure_curl || return 1
+
+    local tags=()
+    if [ "$version" = "latest" ]; then
+        if [ "$templated" = true ]; then
+            local latest_tag
+            latest_tag=$(github_latest_release_tag "$repo") || return 1
+            tags=("$latest_tag")
+        else
+            tags=("latest")
+        fi
+    else
+        tags=("$version")
+        case "$version" in
+            v*) tags+=("${version#v}") ;;
+            *) tags+=("v${version}") ;;
+        esac
+    fi
+
+    local work_dir
+    work_dir=$(mktemp -d)
+    local download="${work_dir}/asset"
+    local tag name rc found=""
+
+    for tag in "${tags[@]}"; do
+        for asset in "${assets[@]}"; do
+            name=${asset//\{tag\}/$tag}
+            name=${name//\{version\}/${tag#v}}
+            rc=0
+            github_release_download "$repo" "$tag" "$name" "$download" || rc=$?
+            if [ "$rc" -eq 0 ]; then
+                found="$name"
+                break 2
+            elif [ "$rc" -ne 2 ]; then
+                rm -rf "$work_dir"
+                return 1
+            fi
+        done
+    done
+
+    if [ -z "$found" ]; then
+        rm -rf "$work_dir"
+        if [ "$version" = "latest" ] && [ "$templated" = false ]; then
+            echo "Error: the latest release of ${repo} has no asset named: ${assets[*]}" >&2
+            return 1
+        fi
+        for tag in "${tags[@]}"; do
+            if _github_release_tag_exists "$repo" "$tag"; then
+                echo "Error: release ${tag} of ${repo} has no asset for this platform (tried: ${assets[*]})" >&2
+                return 1
+            fi
+        done
+        echo "Error: release ${version} not found in ${repo}" >&2
+        return 1
+    fi
+
+    local source="$download"
+    case "$found" in
+        *.tar.gz | *.tgz)
+            mkdir -p "${work_dir}/extract"
+            tar -xzf "$download" -C "${work_dir}/extract"
+            source=$(find "${work_dir}/extract" -type f -name "$binary" | head -n 1)
+            if [ -z "$source" ]; then
+                echo "Error: ${binary} not found in ${found}" >&2
+                rm -rf "$work_dir"
+                return 1
+            fi
+            ;;
+    esac
+
+    mkdir -p "$GITHUB_RELEASE_BIN_DIR"
+    install -m 0755 "$source" "${GITHUB_RELEASE_BIN_DIR}/${binary}"
+    rm -rf "$work_dir"
+    echo "Installed ${binary} from ${repo} (${found}) to ${GITHUB_RELEASE_BIN_DIR}/${binary}"
 }

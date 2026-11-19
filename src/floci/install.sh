@@ -17,6 +17,9 @@ set -e
 
 . ./library_scripts.sh
 
-install_gh_release_binary 'floci-io/floci-cli' 'floci' "$VERSION"
+arch=$(release_arch amd64 arm64)
+
+install_github_release_binary 'floci-io/floci-cli' floci "$VERSION" \
+    "floci-linux-${arch}"
 
 echo 'Done!'

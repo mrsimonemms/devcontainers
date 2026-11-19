@@ -123,12 +123,8 @@ jobs:
           devcontainer --version
 
       - name: Test feature
-        uses: nick-fields/retry@v4
-        with:
-          max_attempts: 3
-          retry_wait_seconds: 30
-          timeout_minutes: 30
-          command: make test FEATURE=${{ matrix.feature }}
+        timeout-minutes: 30
+        run: make test FEATURE=${{ matrix.feature }}
 
   base:
     runs-on: ${{ matrix.runner.image }}

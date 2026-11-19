@@ -17,6 +17,9 @@ set -e
 
 . ./library_scripts.sh
 
-install_gh_release_binary 'coreos/butane' 'butane' "$VERSION"
+arch=$(release_arch x86_64 aarch64)
+
+install_github_release_binary 'coreos/butane' butane "$VERSION" \
+    "butane-${arch}-unknown-linux-gnu"
 
 echo 'Done!'

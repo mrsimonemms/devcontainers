@@ -33,6 +33,7 @@ if ! perl -e 'use open ":encoding(UTF-8)"' >/dev/null 2>&1; then
     fi
 fi
 
-install_gh_release_binary 'so-fancy/diff-so-fancy' 'diff-so-fancy' "$VERSION"
+install_github_release_binary 'so-fancy/diff-so-fancy' diff-so-fancy "$VERSION" \
+    "diff-so-fancy"
 
 echo 'Done!'

@@ -49,11 +49,11 @@ IFS=',' read -ra BINARIES <<< "$binary_names"
 
 for binary in "${BINARIES[@]}"; do
     echo "Downloading ${binary}..."
-    DOWNLOAD_URL="https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/download/v${VERSION}/${binary}-$(uname -s)-$(uname -m)"
+    ASSET="${binary}-$(uname -s)-$(uname -m)"
 
-    if ! curl -fsSL "$DOWNLOAD_URL" -o "${BIN}/${binary}"; then
+    if ! github_release_download "${REPO_OWNER}/${REPO_NAME}" "v${VERSION}" "${ASSET}" "${BIN}/${binary}"; then
         echo "Error: Failed to download ${binary} version v${VERSION}."
-        echo "URL: ${DOWNLOAD_URL}"
+        echo "URL: https://github.com/${REPO_OWNER}/${REPO_NAME}/releases/download/v${VERSION}/${ASSET}"
         rm -f "${BIN}/${binary}"
         exit 1
     fi

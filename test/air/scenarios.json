@@ -1,0 +1,10 @@
+{
+  "explicit_version": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "air": {
+        "version": "v1.67.3"
+      }
+    }
+  }
+}
