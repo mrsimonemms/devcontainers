@@ -35,6 +35,7 @@ This is a series of pre-built Devcontainer image to allow local development.
 * [Dingo](./src/dingo)
 * [Floci](./src/floci)
 * [Temporal Cloud CLI](./src/tcld)
+* [Temporal MCP](./src/temporal-mcp/)
 * [Temporal NexGen](./src/temporal-nexgen/)
 * [Zigflow](./src/zigflow)
 

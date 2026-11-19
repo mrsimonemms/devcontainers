@@ -1,0 +1,10 @@
+{
+  "explicit_version": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "temporal-mcp": {
+        "version": "v0.0.5"
+      }
+    }
+  }
+}

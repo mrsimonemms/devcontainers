@@ -1,0 +1,16 @@
+{
+  "name": "Temporal MCP",
+  "version": "1.0.0",
+  "id": "temporal-mcp",
+  "description": "Run Temporal's official MCP server.",
+  "options": {
+    "version": {
+      "type": "string",
+      "proposals": [
+        "latest"
+      ],
+      "default": "latest",
+      "description": "Select the version you would like to install"
+    }
+  }
+}
