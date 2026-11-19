@@ -1,8 +1,7 @@
 
 # Temporal NexGen (temporal-nexgen)
 
-Generate models and Nexus service definitions for Go, Java, Python, and TypeScript
-from schema definition files.
+Generate models and Nexus service definitions for Go, Java, Python, and TypeScript from schema definition files.
 
 ## Example Usage
 
