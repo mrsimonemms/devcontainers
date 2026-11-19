@@ -1,0 +1,9 @@
+{
+  "with_go": {
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "ghcr.io/devcontainers/features/go:1": {},
+      "cobra-cli": {}
+    }
+  }
+}

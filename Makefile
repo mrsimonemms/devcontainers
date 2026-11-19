@@ -57,3 +57,9 @@ install-devcontainers:
 		npm i -g @devcontainers/cli; \
 	fi
 .PHONY: install-devcontainers
+
+test:
+	@devcontainer features test \
+		--base-image mcr.microsoft.com/devcontainers/base:ubuntu \
+		$(if ${FEATURE},--features ${FEATURE})
+.PHONY: test

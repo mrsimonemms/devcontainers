@@ -1,7 +1,7 @@
 {
   "name": "Temporal Cloud CLI (tcld)",
   "id": "tcld",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "A CLI tool for managing Temporal Cloud namespaces.",
   "options": {
     "git_repo": {
@@ -35,7 +35,11 @@
   },
   "dependsOn": {
     "ghcr.io/devcontainers/features/go:1": {},
-    "ghcr.io/jungaretti/features/make:1": {}
+    "ghcr.io/jungaretti/features/make:1": {},
+    "ghcr.io/devcontainers/features/git:1": {
+      "version": "os-provided"
+    },
+    "ghcr.io/devcontainers-extra/features/curl-apt-get:1": {}
   },
   "installsAfter": [
     "ghcr.io/devcontainers/features/common-utils",

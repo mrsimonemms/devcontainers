@@ -48,6 +48,7 @@ go install github.com/spf13/cobra-cli@${VERSION}
 chown -R "${USERNAME}:golang" "${TARGET_GOPATH}"
 chmod -R g+r+w "${TARGET_GOPATH}"
 
+mkdir -p /etc/bash_completion.d
 cobra-cli completion bash > /etc/bash_completion.d/cobra-cli
 
 echo "Symlinking $PWD/.cobra.yaml to $HOME/.cobra.yaml"
