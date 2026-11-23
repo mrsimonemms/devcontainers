@@ -1,0 +1,13 @@
+{
+  "latest_without_curl": {
+    "image": "debian:bookworm-slim",
+    "features": {
+      "restate": {
+        "installCLI": false,
+        "installServer": false,
+        "installRestatectl": true,
+        "restatectlVersion": "latest"
+      }
+    }
+  }
+}
