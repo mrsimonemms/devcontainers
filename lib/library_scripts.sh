@@ -48,6 +48,25 @@ ensure_curl() {
     fi
 }
 
+ensure_xz() {
+    # Install xz if it isn't available. Only needed for .tar.xz assets
+    if type xz >/dev/null 2>&1; then
+        return 0
+    fi
+
+    echo "Installing xz"
+    if [ -x /usr/bin/apt-get ]; then
+        apt-get update -y
+        apt-get install -y --no-install-recommends xz-utils
+        rm -rf /var/lib/apt/lists/*
+    elif [ -x /sbin/apk ]; then
+        apk add --no-cache xz
+    else
+        echo "Error: xz is required and no supported package manager was found" >&2
+        return 1
+    fi
+}
+
 release_arch() {
     # Print the upstream name for this machine's architecture.
     #
@@ -228,7 +247,7 @@ github_latest_release_tag() {
     local rc=0
     local tag
 
-    ensure_curl || return 1
+    ensure_curl >&2 || return 1
 
     http_fetch "https://github.com/${repo}/releases/latest" /dev/null --no-follow || rc=$?
     if [ "$rc" -eq 2 ]; then
@@ -303,8 +322,9 @@ install_github_release_binary() {
     # Otherwise "latest" is resolved through the public releases/latest
     # redirect first.
     #
-    # .tar.gz/.tgz assets are extracted and <binary> found inside; any other
-    # asset is installed as the binary itself.
+    # .tar.gz/.tgz and .tar.xz/.txz assets are extracted and <binary> found
+    # inside (xz is installed if needed); any other asset is installed as the
+    # binary itself.
     local repo=$1
     local binary=$2
     local version=$3
@@ -380,14 +400,24 @@ install_github_release_binary() {
         *.tar.gz | *.tgz)
             mkdir -p "${work_dir}/extract"
             tar -xzf "$download" -C "${work_dir}/extract"
-            source=$(find "${work_dir}/extract" -type f -name "$binary" | head -n 1)
-            if [ -z "$source" ]; then
-                echo "Error: ${binary} not found in ${found}" >&2
+            ;;
+        *.tar.xz | *.txz)
+            if ! ensure_xz; then
                 rm -rf "$work_dir"
                 return 1
             fi
+            mkdir -p "${work_dir}/extract"
+            xz -dc "$download" | tar -xf - -C "${work_dir}/extract"
             ;;
     esac
+    if [ -d "${work_dir}/extract" ]; then
+        source=$(find "${work_dir}/extract" -type f -name "$binary" | head -n 1)
+        if [ -z "$source" ]; then
+            echo "Error: ${binary} not found in ${found}" >&2
+            rm -rf "$work_dir"
+            return 1
+        fi
+    fi
 
     mkdir -p "$GITHUB_RELEASE_BIN_DIR"
     install -m 0755 "$source" "${GITHUB_RELEASE_BIN_DIR}/${binary}"
