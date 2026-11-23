@@ -34,9 +34,10 @@ This is a series of pre-built Devcontainer image to allow local development.
 * [Diff So Fancy](./src/diff-so-fancy)
 * [Dingo](./src/dingo)
 * [Floci](./src/floci)
+* [Restate](./src/restate)
 * [Temporal Cloud CLI](./src/tcld)
-* [Temporal MCP](./src/temporal-mcp/)
-* [Temporal NexGen](./src/temporal-nexgen/)
+* [Temporal MCP](./src/temporal-mcp)
+* [Temporal NexGen](./src/temporal-nexgen)
 * [Zigflow](./src/zigflow)
 
 ## Images
